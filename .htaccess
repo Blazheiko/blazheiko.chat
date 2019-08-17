@@ -1,0 +1,11 @@
+# www/.htaccess
+
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteRule ^$ public/ [L]
+RewriteRule ((?s).*) public/$1 [L]
+RewriteEngine On
+RewriteBase /
+RewriteCond %{HTTP:SSL} !=1 [NC]
+RewriteRule ^(.*) https://www.blazheiko.club/$1 [L,R=301]
+</IfModule>
