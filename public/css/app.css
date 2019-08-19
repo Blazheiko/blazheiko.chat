@@ -1140,9 +1140,8 @@ pre code {
   }
 
   .col-md-12 {
-      display: flex;
-      flex: 0 0 100%;
-      max-width: 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
   }
 
   .order-md-first {

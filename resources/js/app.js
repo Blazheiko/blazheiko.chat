@@ -46,6 +46,14 @@ const app = new Vue({
     },
 
     methods: {
+        startConversationWith(contact) {
+            // this.updateUnreadCount(contact, true);
+            axios.get(`/conversation/${contact.id}`)
+                .then((response) => {
+                    this.messages = response.data;
+                    this.selectedContact = contact;
+                })
+        },
         fetchMessages() {
             axios.get('/messages').then(response => {
                 this.messages = response.data;

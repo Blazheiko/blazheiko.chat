@@ -1781,11 +1781,37 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['contacts']
+  props: {
+    contacts: {
+      type: Array,
+      "default": []
+    }
+  },
+  data: function data() {
+    return {
+      selected: this.contacts.length ? this.contacts[0] : null
+    };
+  },
+  methods: {
+    selectContact: function selectContact(contact) {
+      this.selected = contact;
+      this.$emit('selected', contact);
+    }
+  },
+  computed: {
+    sortedContacts: function sortedContacts() {
+      var _this = this;
+
+      return _.sortBy(this.contacts, [function (contact) {
+        if (contact == _this.selected) {
+          return Infinity;
+        }
+
+        return contact.unread;
+      }]).reverse();
+    }
+  }
 });
 
 /***/ }),
@@ -6298,7 +6324,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  /*max-height: 600px;*/\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n  max-height: 600px;\n  width: -webkit-min-content;\n  width: -moz-min-content;\n  width: min-content;\n  overflow: scroll;\n}\n.contacts-list ul[data-v-b89f32fe] {\n  list-style-type: none;\n  padding-left: 0;\n}\n.contacts-list ul li[data-v-b89f32fe] {\n  display: flex;\n  padding: 2px;\n  border-bottom: 1px solid #aaaaaa;\n  height: 80px;\n  position: relative;\n  cursor: pointer;\n}\n.contacts-list ul li.selected[data-v-b89f32fe] {\n  background: #dfdfdf;\n}\n.contacts-list ul li span.unread[data-v-b89f32fe] {\n  background: #82e0a8;\n  color: #fff;\n  position: absolute;\n  right: 11px;\n  top: 20px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li .avatar[data-v-b89f32fe] {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.contacts-list ul li .avatar img[data-v-b89f32fe] {\n  width: 35px;\n  border-radius: 50%;\n  margin: 0 auto;\n}\n.contacts-list ul li .contact[data-v-b89f32fe] {\n  flex: 3;\n  font-size: 10px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.contacts-list ul li .contact p[data-v-b89f32fe] {\n  margin: 0;\n}\n.contacts-list ul li .contact p.name[data-v-b89f32fe] {\n  font-weight: bold;\n}", ""]);
+exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  /*max-height: 600px;*/\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n  max-height: 700px;\n  width: -webkit-min-content;\n  width: -moz-min-content;\n  width: min-content;\n  overflow: scroll;\n}\n.contacts-list ul[data-v-b89f32fe] {\n  list-style-type: none;\n  padding-left: 0;\n}\n.contacts-list ul li[data-v-b89f32fe] {\n  display: flex;\n  padding: 2px;\n  border-bottom: 1px solid #aaaaaa;\n  height: 80px;\n  position: relative;\n  cursor: pointer;\n}\n.contacts-list ul li.selected[data-v-b89f32fe] {\n  background: #dfdfdf;\n}\n.contacts-list ul li span.unread[data-v-b89f32fe] {\n  background: #82e0a8;\n  color: #fff;\n  position: absolute;\n  right: 11px;\n  top: 20px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li .avatar[data-v-b89f32fe] {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.contacts-list ul li .avatar img[data-v-b89f32fe] {\n  width: 35px;\n  border-radius: 50%;\n  margin: 0 auto;\n}\n.contacts-list ul li .contact[data-v-b89f32fe] {\n  flex: 3;\n  font-size: 10px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.contacts-list ul li .contact p[data-v-b89f32fe] {\n  margin: 0;\n}\n.contacts-list ul li .contact p.name[data-v-b89f32fe] {\n  font-weight: bold;\n}", ""]);
 
 // exports
 
@@ -47979,36 +48005,50 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "ul",
-    { staticClass: "contacts-list" },
-    [
-      _c("a", [_vm._v("Messages")]),
-      _vm._v(" "),
+  return _c("div", { staticClass: "contacts-list" }, [
+    _c("a", [_vm._v("Список Контактов")]),
+    _vm._v(" "),
+    _c(
+      "ul",
       _vm._l(_vm.contacts, function(contact) {
-        return _c("li", { staticClass: "left clearfix" }, [
-          _c("div", { staticClass: "chat-body clearfix" }, [
-            _c("div", { staticClass: "header" }, [
-              _c("strong", { staticClass: "primary-font" }, [
-                _c("img", {
-                  staticStyle: {
-                    width: "32px",
-                    height: "32px",
-                    "border-radius": "50%"
-                  },
-                  attrs: { src: "/uploads/avatars/" + contact.avatar }
-                }),
-                _vm._v(
-                  "\n                " + _vm._s(contact.name) + "\n            "
-                )
-              ])
-            ])
-          ])
-        ])
-      })
-    ],
-    2
-  )
+        return _c(
+          "li",
+          {
+            key: contact.id,
+            class: { selected: contact == _vm.selected },
+            on: {
+              click: function($event) {
+                return _vm.selectContact(contact)
+              }
+            }
+          },
+          [
+            _c("div", { staticClass: "avatar" }, [
+              _c("img", {
+                attrs: {
+                  src: "/uploads/avatars/" + contact.avatar,
+                  alt: contact.name
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "contact" }, [
+              _c("p", { staticClass: "name" }, [_vm._v(_vm._s(contact.name))]),
+              _vm._v(" "),
+              _c("p", { staticClass: "email" }, [_vm._v(_vm._s(contact.email))])
+            ]),
+            _vm._v(" "),
+            contact.unread
+              ? _c("span", { staticClass: "unread" }, [
+                  _vm._v(_vm._s(contact.unread))
+                ])
+              : _vm._e()
+          ]
+        )
+      }),
+      0
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -60280,27 +60320,36 @@ var app = new Vue({
     container.scrollTop = container.scrollHeight;
   },
   methods: {
-    fetchMessages: function fetchMessages() {
+    startConversationWith: function startConversationWith(contact) {
       var _this2 = this;
 
-      axios.get('/messages').then(function (response) {
+      // this.updateUnreadCount(contact, true);
+      axios.get("/conversation/".concat(contact.id)).then(function (response) {
         _this2.messages = response.data;
+        _this2.selectedContact = contact;
+      });
+    },
+    fetchMessages: function fetchMessages() {
+      var _this3 = this;
+
+      axios.get('/messages').then(function (response) {
+        _this3.messages = response.data;
       });
     },
     fetchConversations: function fetchConversations() {
-      var _this3 = this;
+      var _this4 = this;
 
       axios.get('/conversations').then(function (response) {
         console.log(response.data);
-        _this3.conversations = response.data;
+        _this4.conversations = response.data;
       });
     },
     fetchContacts: function fetchContacts() {
-      var _this4 = this;
+      var _this5 = this;
 
       axios.get('/contacts').then(function (response) {
-        _this4.contacts = response.data;
-        console.log(_this4.contacts);
+        _this5.contacts = response.data;
+        console.log(_this5.contacts);
       });
     },
     addMessage: function addMessage(message) {
@@ -60310,12 +60359,12 @@ var app = new Vue({
       });
     },
     update: function update(e) {
-      var _this5 = this;
+      var _this6 = this;
 
       e.preventDefault();
       var photoname = this.gatherFormData();
       axios.post('photo', photoname).then(function (response) {
-        return _this5.messages.push({
+        return _this6.messages.push({
           message: response.data.message.message,
           photo_url: response.data.message.photo_url,
           is_photo: response.data.message.is_photo,

@@ -24,6 +24,9 @@
             /*width: 900px;*/
             white-space:nowrap;
         }
+        .col-md-12 {
+            display: flex;
+        }
         /*.row div{*/
             /*display:inline-block;*/
             /*border:1px solid black;*/
