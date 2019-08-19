@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Conversation;
 use App\Events\MessageSent;
 use App\Message;
 use App\User;
@@ -39,6 +40,20 @@ class ChatsController extends Controller
         return Message::with('user')->get();
     }
 
+
+    public function fetchConversations()
+    {
+       // dd(Conversation::with('user')->get());
+
+        return Conversation::with('user')->get();
+    }
+
+    public function fetchContacts()
+    {
+        // dd(Conversation::with('user')->get());
+
+        return User::where('id', '!=', auth()->id())->get();
+    }
 
 
     /**

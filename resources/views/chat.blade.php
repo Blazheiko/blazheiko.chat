@@ -6,7 +6,7 @@
     {{--<span>В блоке чат блейд</span>--}}
     <div class="container" xmlns:v-bind="http://www.w3.org/1999/xhtml">
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
+            <div class="col-md-12 col-md-offset-2">
                 <div class="panel panel-default">
                     {{--<example></example>--}}
                     <div class="panel-heading">Chats</div>
@@ -22,19 +22,15 @@
                         ></chat-form>
 
                     </div>
-
                     <span>Select New Photo</span>
-                    <input ref="photo" type="file" class="form-control" name="photo" @change="update">
-
-
-
-
+                    <input ref="photo" type="file" class="" name="photo" @change="update">
 
                 </div>
+                <div class="list-group">
+                    <chat-list :contacts="contacts"></chat-list>
+                </div>
             </div>
-            <div class="list-group">
-                <chat-list></chat-list>
-            </div>
+
         </div>
     </div>
 @endsection

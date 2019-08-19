@@ -46,6 +46,10 @@ Route::get('/comment/{comment}/delete', ['as' => 'comment.destroy', 'uses' => 'C
 Route::get('/chat', 'ChatsController@index');
 Route::get('messages', 'ChatsController@fetchMessages');
 Route::post('messages', 'ChatsController@sendMessage');
+
+Route::get('conversations', 'ChatsController@fetchConversations');
+Route::get('contacts', 'ChatsController@fetchContacts');
+
 Route::post('/photo',            ['as' => 'addphoto',  'uses' =>'UploadPhotoController']);
 
 //Route::get('/facebook/redirect', 'Auth\SocialAuthFacebookController@redirectToProvider');

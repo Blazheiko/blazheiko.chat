@@ -54,12 +54,19 @@
             /*height: 400px;*/
             width: 1150px;
         }
-        
+
         .panel-bodychat {
+            display: Flex;
             float:left;
             overflow-y: scroll;
             height: 600px;
-            width: 800px;
+            width: 600px;
+        }
+        .panel panel-default{
+            width: 600px;
+        }
+        .panel-footer{
+            width: 600px;
         }
 
         ::-webkit-scrollbar-track {

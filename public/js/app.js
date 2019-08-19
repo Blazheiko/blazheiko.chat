@@ -1769,8 +1769,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: {}
+  props: ['contacts']
 });
 
 /***/ }),
@@ -6283,7 +6298,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  max-height: 600px;\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n}", ""]);
+exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  /*max-height: 600px;*/\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n  max-height: 600px;\n  width: -webkit-min-content;\n  width: -moz-min-content;\n  width: min-content;\n  overflow: scroll;\n}\n.contacts-list ul[data-v-b89f32fe] {\n  list-style-type: none;\n  padding-left: 0;\n}\n.contacts-list ul li[data-v-b89f32fe] {\n  display: flex;\n  padding: 2px;\n  border-bottom: 1px solid #aaaaaa;\n  height: 80px;\n  position: relative;\n  cursor: pointer;\n}\n.contacts-list ul li.selected[data-v-b89f32fe] {\n  background: #dfdfdf;\n}\n.contacts-list ul li span.unread[data-v-b89f32fe] {\n  background: #82e0a8;\n  color: #fff;\n  position: absolute;\n  right: 11px;\n  top: 20px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li .avatar[data-v-b89f32fe] {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.contacts-list ul li .avatar img[data-v-b89f32fe] {\n  width: 35px;\n  border-radius: 50%;\n  margin: 0 auto;\n}\n.contacts-list ul li .contact[data-v-b89f32fe] {\n  flex: 3;\n  font-size: 10px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.contacts-list ul li .contact p[data-v-b89f32fe] {\n  margin: 0;\n}\n.contacts-list ul li .contact p.name[data-v-b89f32fe] {\n  font-weight: bold;\n}", ""]);
 
 // exports
 
@@ -17265,25 +17280,25 @@ var PusherChannel = function (_Channel) {
  * This class represents a Pusher private channel.
  */
 var PusherPrivateChannel = function (_PusherChannel) {
-    inherits(PusherPrivateChannel, _PusherChannel);
+  inherits(PusherPrivateChannel, _PusherChannel);
 
-    function PusherPrivateChannel() {
-        classCallCheck(this, PusherPrivateChannel);
-        return possibleConstructorReturn(this, (PusherPrivateChannel.__proto__ || Object.getPrototypeOf(PusherPrivateChannel)).apply(this, arguments));
+  function PusherPrivateChannel() {
+    classCallCheck(this, PusherPrivateChannel);
+    return possibleConstructorReturn(this, (PusherPrivateChannel.__proto__ || Object.getPrototypeOf(PusherPrivateChannel)).apply(this, arguments));
+  }
+
+  createClass(PusherPrivateChannel, [{
+    key: 'whisper',
+
+    /**
+     * Trigger client event on the channel.
+     */
+    value: function whisper(eventName, data) {
+      this.pusher.channels.channels[this.name].trigger('client-' + eventName, data);
+      return this;
     }
-
-    createClass(PusherPrivateChannel, [{
-        key: 'whisper',
-
-        /**
-         * Trigger client event on the channel.
-         */
-        value: function whisper(eventName, data) {
-            this.pusher.channels.channels[this.name].trigger('client-' + eventName, data);
-            return this;
-        }
-    }]);
-    return PusherPrivateChannel;
+  }]);
+  return PusherPrivateChannel;
 }(PusherChannel);
 
 /**
@@ -17862,11 +17877,11 @@ var SocketIoConnector = function (_Connector) {
     }, {
         key: 'getSocketIO',
         value: function getSocketIO() {
-            if (typeof io !== 'undefined') {
-                return io;
-            }
             if (typeof this.options.client !== 'undefined') {
                 return this.options.client;
+            }
+            if (typeof io !== 'undefined') {
+                return io;
             }
             throw new Error('Socket.io client not found. Should be globally available or passed via options.client');
         }
@@ -18125,13 +18140,22 @@ var Echo = function () {
             return this.connector.presenceChannel(channel);
         }
         /**
-         * Leave the given channel.
+         * Leave the given channel, as well as its private and presence variants.
          */
 
     }, {
         key: 'leave',
         value: function leave(channel) {
             this.connector.leave(channel);
+        }
+        /**
+         * Leave the given channel.
+         */
+
+    }, {
+        key: 'leaveChannel',
+        value: function leaveChannel(channel) {
+            this.connector.leaveChannel(channel);
         }
         /**
          * Listen for an event on a channel instance.
@@ -47955,9 +47979,36 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "contacts-list" }, [
-    _vm._v("\n    Список пользователей\n")
-  ])
+  return _c(
+    "ul",
+    { staticClass: "contacts-list" },
+    [
+      _c("a", [_vm._v("Messages")]),
+      _vm._v(" "),
+      _vm._l(_vm.contacts, function(contact) {
+        return _c("li", { staticClass: "left clearfix" }, [
+          _c("div", { staticClass: "chat-body clearfix" }, [
+            _c("div", { staticClass: "header" }, [
+              _c("strong", { staticClass: "primary-font" }, [
+                _c("img", {
+                  staticStyle: {
+                    width: "32px",
+                    height: "32px",
+                    "border-radius": "50%"
+                  },
+                  attrs: { src: "/uploads/avatars/" + contact.avatar }
+                }),
+                _vm._v(
+                  "\n                " + _vm._s(contact.name) + "\n            "
+                )
+              ])
+            ])
+          ])
+        ])
+      })
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -60200,19 +60251,21 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js"); //
 // Vue.component('example', require('./components/ExampleComponent.vue').default);
 
-Vue.component('chat-messages', __webpack_require__(/*! ./components/ChatMessages.vue */ "./resources/js/components/ChatMessages.vue").default);
-Vue.component('chat-form', __webpack_require__(/*! ./components/ChatForm.vue */ "./resources/js/components/ChatForm.vue").default);
-Vue.component('chat-list', __webpack_require__(/*! ./components/ChatList.vue */ "./resources/js/components/ChatList.vue").default);
+Vue.component('chat-messages', __webpack_require__(/*! ./components/ChatMessages.vue */ "./resources/js/components/ChatMessages.vue")["default"]);
+Vue.component('chat-form', __webpack_require__(/*! ./components/ChatForm.vue */ "./resources/js/components/ChatForm.vue")["default"]);
+Vue.component('chat-list', __webpack_require__(/*! ./components/ChatList.vue */ "./resources/js/components/ChatList.vue")["default"]);
 var app = new Vue({
   el: '#app',
   data: {
-    messages: []
+    messages: [],
+    contacts: []
   },
   created: function created() {
     var _this = this;
 
     this.fetchMessages();
-    Echo.private('chat').listen('MessageSent', function (e) {
+    this.fetchContacts();
+    Echo["private"]('chat').listen('MessageSent', function (e) {
       _this.messages.push({
         message: e.message.message,
         photo_url: e.message.photo_url,
@@ -60234,6 +60287,22 @@ var app = new Vue({
         _this2.messages = response.data;
       });
     },
+    fetchConversations: function fetchConversations() {
+      var _this3 = this;
+
+      axios.get('/conversations').then(function (response) {
+        console.log(response.data);
+        _this3.conversations = response.data;
+      });
+    },
+    fetchContacts: function fetchContacts() {
+      var _this4 = this;
+
+      axios.get('/contacts').then(function (response) {
+        _this4.contacts = response.data;
+        console.log(_this4.contacts);
+      });
+    },
     addMessage: function addMessage(message) {
       this.messages.push(message);
       axios.post('/messages', message).then(function (response) {
@@ -60241,12 +60310,12 @@ var app = new Vue({
       });
     },
     update: function update(e) {
-      var _this3 = this;
+      var _this5 = this;
 
       e.preventDefault();
       var photoname = this.gatherFormData();
       axios.post('photo', photoname).then(function (response) {
-        return _this3.messages.push({
+        return _this5.messages.push({
           message: response.data.message.message,
           photo_url: response.data.message.photo_url,
           is_photo: response.data.message.is_photo,
@@ -60282,7 +60351,7 @@ window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
  */
 
 try {
-  window.Popper = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js").default;
+  window.Popper = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js")["default"];
   window.$ = window.jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 
   __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
@@ -60570,8 +60639,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\OSPanel\domains\blazheiko\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\OSPanel\domains\blazheiko\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\OSPanel\domains\blazheiko.club\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\OSPanel\domains\blazheiko.club\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

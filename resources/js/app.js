@@ -18,11 +18,14 @@ const app = new Vue({
     el: '#app',
 
     data: {
-        messages: []
+        messages: [],
+        contacts:[]
     },
 
     created() {
         this.fetchMessages();
+        this.fetchContacts();
+
 
         Echo.private('chat')
             .listen('MessageSent', (e) => {
@@ -46,6 +49,20 @@ const app = new Vue({
         fetchMessages() {
             axios.get('/messages').then(response => {
                 this.messages = response.data;
+            });
+        },
+
+        fetchConversations() {
+            axios.get('/conversations').then(response => {
+                console.log(response.data);
+                this.conversations = response.data;
+            });
+        },
+        fetchContacts() {
+            axios.get('/contacts').then(response => {
+                this.contacts = response.data;
+                console.log(this.contacts);
+
             });
         },
 
