@@ -44,7 +44,7 @@ Route::post('/comment/{comment}',       ['as' => 'comment.update',  'uses' => 'C
 Route::get('/comment/{comment}/delete', ['as' => 'comment.destroy', 'uses' => 'CommentController@destroy']);
 
 Route::get('/chat', 'ChatsController@index');
-Route::get('messages', 'ChatsController@fetchMessages');
+Route::get('messages/{id}', 'ChatsController@fetchMessages');
 Route::post('messages', 'ChatsController@sendMessage');
 
 Route::get('conversations', 'ChatsController@fetchConversations');

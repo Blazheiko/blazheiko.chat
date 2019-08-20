@@ -6,6 +6,7 @@ use App\Conversation;
 use App\Events\MessageSent;
 use App\Message;
 use App\User;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,11 +34,38 @@ class ChatsController extends Controller
      *
      * @return Message
      */
-    public function fetchMessages()
+    public function fetchMessages($id)
     {
-//        dd(Message::with('user')->get());
 
-        return Message::with('user')->get();
+
+        $userId = auth()->id();
+        $conversationStart = Conversation::where(function($q) use ($id,$userId) {
+            $q->where('user_id', $userId);
+            $q->where('user_to_id', $id);
+        })->orWhere(function($q) use ($id,$userId) {
+            $q->where('user_id', $id);
+            $q->where('user_to_id', $userId);
+        })
+            ->get();
+//        return response(count($conversationStart));
+        if (count($conversationStart)==0){
+            $messagesStart['message'] = 'Начало чата с пользователем';
+            $messagesStart['photo_url'] = '';
+            $messagesStart['is_photo'] = false;
+
+            $date = new DateTime();
+            $messagesStart['datatime'] = $date->getTimestamp();
+
+
+            $conversationStart=new Conversation([
+                'user_id' => $userId,'user_to_id' => $id,'messages' => $messagesStart]);
+            $conversationStart->save();
+        }
+//        dd($messagesStart);
+
+        return response(['conversation'=>$conversationStart]);
+
+//        return response()->json($conversationStart->messages);
     }
 
 

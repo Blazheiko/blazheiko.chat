@@ -1,6 +1,6 @@
 <template>
     <div class="contacts-list">
-        <a>Список Контактов</a>
+        <a>Список Контактов </a>
     <ul>
         <li v-for="contact in contacts" :key="contact.id" @click="selectContact(contact)" :class="{ 'selected': contact == selected }">
             <div class="avatar">

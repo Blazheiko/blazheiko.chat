@@ -1,21 +1,22 @@
 
 <template>
-    <ul class="chat">
-        <a>Messages</a>
-        <li class="left clearfix" v-for="message in messages">
-            <div   class="chat-body clearfix">
-                <div class="header">
 
-                    <strong class="primary-font">
-                        <img v-bind:src="'/uploads/avatars/'+ message.user.avatar" style="width:32px; height:32px; border-radius:50%">
-                        {{ message.user.name }}
-                    </strong>
-                </div>
-                <p>
-                    {{ message.message }}
-                </p>
+        <ul class="chat">
 
-                <span v-if="message.is_photo">
+            <li class="left clearfix" v-for="message in messages">
+                <div   class="chat-body clearfix">
+                    <div class="header">
+
+                        <strong class="primary-font">
+                            <img v-bind:src="'/uploads/avatars/'+ message.user.avatar" style="width:32px; height:32px; border-radius:50%">
+                            {{ message.user.name }}
+                        </strong>
+                    </div>
+                    <p>
+                        {{ message.message }}
+                    </p>
+
+                    <span v-if="message.is_photo">
                         <div class="modal-header">
 
                               <div class="col-md-10 col-md-offset-1">
@@ -29,9 +30,11 @@
 
 
 
-            </div>
-        </li>
-    </ul>
+                </div>
+            </li>
+        </ul>
+
+
 </template>
 
 <script>

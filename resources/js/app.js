@@ -12,20 +12,19 @@ window.Vue = require('vue');
 Vue.component('chat-messages', require('./components/ChatMessages.vue').default);
 Vue.component('chat-form', require('./components/ChatForm.vue').default);
 Vue.component('chat-list', require('./components/ChatList.vue').default);
-
+Vue.component('chat-header', require('./components/Header.vue').default);
 
 const app = new Vue({
     el: '#app',
 
     data: {
         messages: [],
-        contacts:[]
+        contacts:[],
+        contact:null,
     },
 
     created() {
-        this.fetchMessages();
         this.fetchContacts();
-
 
         Echo.private('chat')
             .listen('MessageSent', (e) => {
@@ -48,15 +47,17 @@ const app = new Vue({
     methods: {
         startConversationWith(contact) {
             // this.updateUnreadCount(contact, true);
-            axios.get(`/conversation/${contact.id}`)
+            axios.get(`/conversation/'${contact.id}`)
                 .then((response) => {
                     this.messages = response.data;
                     this.selectedContact = contact;
                 })
         },
-        fetchMessages() {
-            axios.get('/messages').then(response => {
-                this.messages = response.data;
+        fetchMessages(contact) {
+            axios.get('/messages/'+this.contact.id).then(response => {
+                console.log(response.data);
+                // this.messages = response.data;
+
             });
         },
 
@@ -72,6 +73,11 @@ const app = new Vue({
                 console.log(this.contacts);
 
             });
+        },
+
+        selectedContact(contact){
+            this.contact=contact;
+            this.fetchMessages();
         },
 
         addMessage(message) {
