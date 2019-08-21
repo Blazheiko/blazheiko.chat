@@ -71,12 +71,12 @@ class ChatsController extends Controller
     }
 
 
-    public function fetchConversations()
-    {
-       // dd(Conversation::with('user')->get());
-
-        return Conversation::with('user')->get();
-    }
+//    public function fetchConversations()
+//    {
+//       // dd(Conversation::with('user')->get());
+//
+//        return Conversation::with('user')->get();
+//    }
 
     public function fetchContacts()
     {
@@ -94,15 +94,24 @@ class ChatsController extends Controller
      */
     public function sendMessage(Request $request)
     {
+        return response($request);
 //        return ['status' => 'в контроллере'];
 //        dd($request);
         $user = Auth::user();
 //        return ['status' => $request->message];
 
-        $message = $user->messages()->create([
-            'message' => $request->input('message'),'photo_url'=> '',
-        ]);
-        $user->save();
+//        $message = $user->messages()->create([
+//            'message' => $request->input('message'),'photo_url'=> '',
+//        ]);
+//        $user->save();
+        $messages = Conversation::find($request->message);
+        $messagesStart['user_id'] = $user->id;
+        $messagesStart['message'] = 'Начало чата с пользователем';
+        $messagesStart['photo_url'] = '';
+        $messagesStart['is_photo'] = false;
+        $date = new DateTime();
+        $messagesStart['datatime'] = $date->getTimestamp();
+        $messages[]=$messagesStart;
 
 
         broadcast(new MessageSent($user, $message))->toOthers();

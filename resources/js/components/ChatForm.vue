@@ -1,35 +1,41 @@
 <template>
+
     <div class="input-group">
-        <input id="btn-input" type="text" name="message" class="form-control input-sm" placeholder="Type your message here..." v-model="newMessage" @keyup.enter="sendMessage">
-
-        <span class="input-group-btn">
-            <button class="btn btn-primary btn-sm" id="btn-chat" @click="sendMessage">
-                Send
-            </button>
-        </span>
-
+        <div class="composer">
+            <textarea v-model="message" @keydown.enter="send" placeholder="Message..."></textarea>
+        </div>
     </div>
+
 </template>
 
 <script>
     export default {
-        props: ['user'],
-
         data() {
             return {
-                newMessage: '',
-            }
+                message: ''
+            };
         },
-
         methods: {
-            sendMessage() {
-                if (this.newMessage !='') {this.$emit('messagesent', {
-                    user: this.user,
-                    message: this.newMessage
-                });
-                    this.newMessage = ''}
+            send(e) {
+                e.preventDefault();
 
-            },
+                if (this.message == '') {
+                    return;
+                }
+                this.$emit('send', this.message);
+                this.message = '';
+            }
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    .composer textarea {
+        width: 550px;
+        margin: 10px;
+        resize: none;
+        border-radius: 3px;
+        border: 1px solid lightgray;
+        padding: 6px;
+    }
+</style>

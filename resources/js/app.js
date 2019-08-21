@@ -23,7 +23,8 @@ const app = new Vue({
         contact:null,
         conversation:null,
         user:null,
-        userto:null
+        userto:null,
+        conversationid:0
     },
 
     created() {
@@ -35,7 +36,7 @@ const app = new Vue({
                     message: e.message.message,
                     photo_url: e.message.photo_url,
                     is_photo:e.message.is_photo,
-                    user: e.user
+                    userid: e.user.id
                 });
             });
 
@@ -57,7 +58,7 @@ const app = new Vue({
                 // console.log(this.messages);
                 this.user = response.data.user;
                 this.userto = response.data.userto;
-                this.conversation=response.data.conversation
+                this.conversation=response.data.conversation;
             });
         },
 
@@ -80,13 +81,31 @@ const app = new Vue({
             this.fetchMessages();
         },
 
-        addMessage(message) {
-            this.messages.push(message);
-
-            axios.post('/messages', message).then(response => {
+        // addMessage(message) {
+        //
+        //     this.messages.push(message);
+        //
+        //     axios.post('/messages', {
+        //         message: message,
+        //         conversationId: conversation.id
+        //     }).then(response => {
+        //         console.log(response.data);
+        //     });
+        //},
+        // отправляем сообщение на сервер
+        sendMessage(text) {
+            if (!this.contact) {
+                return;
+            }
+            axios.post('/messages', {
+                conversation_id: this.conversation.id,
+                text: text
+            }).then((response) => {
                 console.log(response.data);
-            });
+                // this.$emit('new', response.data);
+            })
         },
+        //отправляем файлы на сервер
         update(e) {
             e.preventDefault();
 
