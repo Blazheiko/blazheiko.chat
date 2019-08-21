@@ -49,6 +49,7 @@ class ChatsController extends Controller
             ->get();
 //        return response(count($conversationStart));
         if (count($conversationStart)==0){
+            $messagesStart['user_id'] = $userId ;
             $messagesStart['message'] = 'Начало чата с пользователем';
             $messagesStart['photo_url'] = '';
             $messagesStart['is_photo'] = false;
@@ -58,14 +59,15 @@ class ChatsController extends Controller
 
 
             $conversationStart=new Conversation([
-                'user_id' => $userId,'user_to_id' => $id,'messages' => $messagesStart]);
+                'user_id' => $userId,'user_to_id' =>(int)$id,'messages' => $messagesStart]);
             $conversationStart->save();
         }
+
+        $userTo=User::find($id);
+        $user = User::find($userId);
 //        dd($messagesStart);
 
-        return response(['conversation'=>$conversationStart]);
-
-//        return response()->json($conversationStart->messages);
+        return response(['conversation'=>$conversationStart,'user'=>$user,'user_to'=>$userTo]);
     }
 
 

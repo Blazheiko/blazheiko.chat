@@ -1864,8 +1864,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['messages']
+  props: ['messages', 'user', 'userto']
 });
 
 /***/ }),
@@ -48103,26 +48109,52 @@ var render = function() {
       return _c("li", { staticClass: "left clearfix" }, [
         _c("div", { staticClass: "chat-body clearfix" }, [
           _c("div", { staticClass: "header" }, [
-            _c("strong", { staticClass: "primary-font" }, [
-              _c("img", {
-                staticStyle: {
-                  width: "32px",
-                  height: "32px",
-                  "border-radius": "50%"
-                },
-                attrs: { src: "/uploads/avatars/" + message.user.avatar }
-              }),
-              _vm._v(
-                "\n                    " +
-                  _vm._s(message.user.name) +
-                  "\n                "
-              )
-            ])
+            message.user_id === _vm.user.id
+              ? _c("div", [
+                  _c("strong", { staticClass: "primary-font" }, [
+                    _c("img", {
+                      staticStyle: {
+                        width: "32px",
+                        height: "32px",
+                        "border-radius": "50%"
+                      },
+                      attrs: { src: "/uploads/avatars/" + _vm.user.avatar }
+                    }),
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.user.name) +
+                        "\n                    "
+                    )
+                  ])
+                ])
+              : _c("div", [
+                  _c("strong", { staticClass: "primary-font" }, [
+                    _c("img", {
+                      staticStyle: {
+                        width: "32px",
+                        height: "32px",
+                        "border-radius": "50%"
+                      },
+                      attrs: { src: "/uploads/avatars/" + _vm.userto.avatar }
+                    }),
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.userto.name) +
+                        "\n                    "
+                    )
+                  ])
+                ])
           ]),
           _vm._v(" "),
           _c("p", [
             _vm._v(
               "\n                " + _vm._s(message.message) + "\n            "
+            )
+          ]),
+          _vm._v(" "),
+          _c("p", [
+            _vm._v(
+              "\n                " + _vm._s(message.datatime) + "\n            "
             )
           ]),
           _vm._v(" "),
@@ -60346,7 +60378,10 @@ var app = new Vue({
   data: {
     messages: [],
     contacts: [],
-    contact: null
+    contact: null,
+    conversation: null,
+    user: null,
+    userto: null
   },
   created: function created() {
     var _this = this;
@@ -60377,24 +60412,34 @@ var app = new Vue({
       });
     },
     fetchMessages: function fetchMessages(contact) {
+      var _this3 = this;
+
       axios.get('/messages/' + this.contact.id).then(function (response) {
-        console.log(response.data); // this.messages = response.data;
+        // console.log(response.data);
+        _this3.messages = [];
+
+        _this3.messages.push(response.data.conversation[0].messages);
+
+        console.log(_this3.messages);
+        _this3.user = response.data.user;
+        _this3.userto = response.data.userto;
+        _this3.conversation = response.data.conversation;
       });
     },
     fetchConversations: function fetchConversations() {
-      var _this3 = this;
+      var _this4 = this;
 
       axios.get('/conversations').then(function (response) {
         console.log(response.data);
-        _this3.conversations = response.data;
+        _this4.conversations = response.data;
       });
     },
     fetchContacts: function fetchContacts() {
-      var _this4 = this;
+      var _this5 = this;
 
       axios.get('/contacts').then(function (response) {
-        _this4.contacts = response.data;
-        console.log(_this4.contacts);
+        _this5.contacts = response.data;
+        console.log(_this5.contacts);
       });
     },
     selectedContact: function selectedContact(contact) {
@@ -60408,12 +60453,12 @@ var app = new Vue({
       });
     },
     update: function update(e) {
-      var _this5 = this;
+      var _this6 = this;
 
       e.preventDefault();
       var photoname = this.gatherFormData();
       axios.post('photo', photoname).then(function (response) {
-        return _this5.messages.push({
+        return _this6.messages.push({
           message: response.data.message.message,
           photo_url: response.data.message.photo_url,
           is_photo: response.data.message.is_photo,

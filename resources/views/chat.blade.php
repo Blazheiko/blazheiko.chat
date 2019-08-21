@@ -16,7 +16,9 @@
 
                     <div  ref='messageDisplay' class="panel-bodychat">
 
-                        <chat-messages :messages="messages" ></chat-messages>
+                        <chat-messages
+                            :messages="messages" :user="user" :userto="userto"
+                        ></chat-messages>
                     </div>
                     <div  class="panel-footer" >
                         <chat-form

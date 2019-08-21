@@ -21,6 +21,9 @@ const app = new Vue({
         messages: [],
         contacts:[],
         contact:null,
+        conversation:null,
+        user:null,
+        userto:null
     },
 
     created() {
@@ -55,9 +58,13 @@ const app = new Vue({
         },
         fetchMessages(contact) {
             axios.get('/messages/'+this.contact.id).then(response => {
-                console.log(response.data);
-                // this.messages = response.data;
-
+                // console.log(response.data);
+                this.messages =[];
+                this.messages.push(response.data.conversation[0].messages);
+                console.log(this.messages);
+                this.user = response.data.user;
+                this.userto = response.data.userto;
+                this.conversation=response.data.conversation
             });
         },
 
