@@ -39,7 +39,7 @@ class ChatsController extends Controller
 
 
         $userId = auth()->id();
-        $conversationStart = Conversation::where(function($q) use ($id,$userId) {
+        $conversation = Conversation::where(function($q) use ($id,$userId) {
             $q->where('user_id', $userId);
             $q->where('user_to_id', $id);
         })->orWhere(function($q) use ($id,$userId) {
@@ -48,26 +48,26 @@ class ChatsController extends Controller
         })
             ->get();
 //        return response(count($conversationStart));
-        if (count($conversationStart)==0){
+        if (count($conversation)==0){
+            $messages =[];
             $messagesStart['user_id'] = $userId ;
             $messagesStart['message'] = 'Начало чата с пользователем';
             $messagesStart['photo_url'] = '';
             $messagesStart['is_photo'] = false;
-
             $date = new DateTime();
             $messagesStart['datatime'] = $date->getTimestamp();
-
+            $messages[]=$messagesStart;
 
             $conversationStart=new Conversation([
-                'user_id' => $userId,'user_to_id' =>(int)$id,'messages' => $messagesStart]);
+                'user_id' => $userId,'user_to_id' =>(int)$id,'messages' => $messages]);
             $conversationStart->save();
+            $conversation[]=$conversationStart;
         }
-
         $userTo=User::find($id);
         $user = User::find($userId);
 //        dd($messagesStart);
 
-        return response(['conversation'=>$conversationStart,'user'=>$user,'user_to'=>$userTo]);
+        return response(['conversation'=>$conversation,'user'=>$user,'userto'=>$userTo]);
     }
 
 

@@ -48102,84 +48102,92 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "ul",
-    { staticClass: "chat" },
-    _vm._l(_vm.messages, function(message) {
-      return _c("li", { staticClass: "left clearfix" }, [
-        _c("div", { staticClass: "chat-body clearfix" }, [
-          _c("div", { staticClass: "header" }, [
-            message.user_id === _vm.user.id
-              ? _c("div", [
-                  _c("strong", { staticClass: "primary-font" }, [
-                    _c("img", {
-                      staticStyle: {
-                        width: "32px",
-                        height: "32px",
-                        "border-radius": "50%"
-                      },
-                      attrs: { src: "/uploads/avatars/" + _vm.user.avatar }
-                    }),
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.user.name) +
-                        "\n                    "
-                    )
+  return _vm.messages
+    ? _c(
+        "ul",
+        { staticClass: "chat" },
+        _vm._l(_vm.messages, function(message) {
+          return _c("li", { staticClass: "left clearfix" }, [
+            _c("div", { staticClass: "chat-body clearfix" }, [
+              _c("div", { staticClass: "header" }, [
+                message.user_id === _vm.user.id
+                  ? _c("div", [
+                      _c("strong", { staticClass: "primary-font" }, [
+                        _c("img", {
+                          staticStyle: {
+                            width: "32px",
+                            height: "32px",
+                            "border-radius": "50%"
+                          },
+                          attrs: { src: "/uploads/avatars/" + _vm.user.avatar }
+                        }),
+                        _vm._v(
+                          "\n                        " +
+                            _vm._s(_vm.user.name) +
+                            "\n                    "
+                        )
+                      ])
+                    ])
+                  : _c("div", [
+                      _c("strong", { staticClass: "primary-font" }, [
+                        _c("img", {
+                          staticStyle: {
+                            width: "32px",
+                            height: "32px",
+                            "border-radius": "50%"
+                          },
+                          attrs: {
+                            src: "/uploads/avatars/" + _vm.userto.avatar
+                          }
+                        }),
+                        _vm._v(
+                          "\n                        " +
+                            _vm._s(_vm.userto.name) +
+                            "\n                    "
+                        )
+                      ])
+                    ])
+              ]),
+              _vm._v(" "),
+              _c("p", [
+                _vm._v(
+                  "\n                " +
+                    _vm._s(message.message) +
+                    "\n            "
+                )
+              ]),
+              _vm._v(" "),
+              _c("p", [
+                _vm._v(
+                  "\n                " +
+                    _vm._s(message.datatime) +
+                    "\n            "
+                )
+              ]),
+              _vm._v(" "),
+              message.is_photo
+                ? _c("span", [
+                    _c("div", { staticClass: "modal-header" }, [
+                      _c("div", { staticClass: "col-md-10 col-md-offset-1" }, [
+                        _c("img", {
+                          staticStyle: {
+                            width: "150px",
+                            height: "150px",
+                            float: "left",
+                            "margin-right": "25px"
+                          },
+                          attrs: { src: "/uploads/photos/" + message.photo_url }
+                        })
+                      ])
+                    ])
                   ])
-                ])
-              : _c("div", [
-                  _c("strong", { staticClass: "primary-font" }, [
-                    _c("img", {
-                      staticStyle: {
-                        width: "32px",
-                        height: "32px",
-                        "border-radius": "50%"
-                      },
-                      attrs: { src: "/uploads/avatars/" + _vm.userto.avatar }
-                    }),
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.userto.name) +
-                        "\n                    "
-                    )
-                  ])
-                ])
-          ]),
-          _vm._v(" "),
-          _c("p", [
-            _vm._v(
-              "\n                " + _vm._s(message.message) + "\n            "
-            )
-          ]),
-          _vm._v(" "),
-          _c("p", [
-            _vm._v(
-              "\n                " + _vm._s(message.datatime) + "\n            "
-            )
-          ]),
-          _vm._v(" "),
-          message.is_photo
-            ? _c("span", [
-                _c("div", { staticClass: "modal-header" }, [
-                  _c("div", { staticClass: "col-md-10 col-md-offset-1" }, [
-                    _c("img", {
-                      staticStyle: {
-                        width: "150px",
-                        height: "150px",
-                        float: "left",
-                        "margin-right": "25px"
-                      },
-                      attrs: { src: "/uploads/photos/" + message.photo_url }
-                    })
-                  ])
-                ])
-              ])
-            : _vm._e()
-        ])
-      ])
-    }),
-    0
-  )
+                : _vm._e()
+            ])
+          ])
+        }),
+        0
+      )
+    : _vm._e()
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -60402,44 +60410,34 @@ var app = new Vue({
     container.scrollTop = container.scrollHeight;
   },
   methods: {
-    startConversationWith: function startConversationWith(contact) {
+    fetchMessages: function fetchMessages(contact) {
       var _this2 = this;
 
-      // this.updateUnreadCount(contact, true);
-      axios.get("/conversation/'".concat(contact.id)).then(function (response) {
-        _this2.messages = response.data;
-        _this2.selectedContact = contact;
-      });
-    },
-    fetchMessages: function fetchMessages(contact) {
-      var _this3 = this;
-
       axios.get('/messages/' + this.contact.id).then(function (response) {
-        // console.log(response.data);
-        _this3.messages = [];
+        console.log(response.data);
+        _this2.messages = [];
 
-        _this3.messages.push(response.data.conversation[0].messages);
+        _this2.messages.push(response.data.conversation[0].messages[0]); // console.log(this.messages);
 
-        console.log(_this3.messages);
-        _this3.user = response.data.user;
-        _this3.userto = response.data.userto;
-        _this3.conversation = response.data.conversation;
+
+        _this2.user = response.data.user;
+        _this2.userto = response.data.userto;
+        _this2.conversation = response.data.conversation;
       });
     },
     fetchConversations: function fetchConversations() {
-      var _this4 = this;
+      var _this3 = this;
 
       axios.get('/conversations').then(function (response) {
-        console.log(response.data);
-        _this4.conversations = response.data;
+        // console.log(response.data);
+        _this3.conversations = response.data;
       });
     },
     fetchContacts: function fetchContacts() {
-      var _this5 = this;
+      var _this4 = this;
 
       axios.get('/contacts').then(function (response) {
-        _this5.contacts = response.data;
-        console.log(_this5.contacts);
+        _this4.contacts = response.data; // console.log(this.contacts);
       });
     },
     selectedContact: function selectedContact(contact) {
@@ -60453,12 +60451,12 @@ var app = new Vue({
       });
     },
     update: function update(e) {
-      var _this6 = this;
+      var _this5 = this;
 
       e.preventDefault();
       var photoname = this.gatherFormData();
       axios.post('photo', photoname).then(function (response) {
-        return _this6.messages.push({
+        return _this5.messages.push({
           message: response.data.message.message,
           photo_url: response.data.message.photo_url,
           is_photo: response.data.message.is_photo,

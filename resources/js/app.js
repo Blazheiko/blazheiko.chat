@@ -48,20 +48,13 @@ const app = new Vue({
     },
 
     methods: {
-        startConversationWith(contact) {
-            // this.updateUnreadCount(contact, true);
-            axios.get(`/conversation/'${contact.id}`)
-                .then((response) => {
-                    this.messages = response.data;
-                    this.selectedContact = contact;
-                })
-        },
+
         fetchMessages(contact) {
             axios.get('/messages/'+this.contact.id).then(response => {
-                // console.log(response.data);
-                this.messages =[];
-                this.messages.push(response.data.conversation[0].messages);
-                console.log(this.messages);
+                console.log(response.data);
+                this.messages=[];
+                this.messages.push(response.data.conversation[0].messages[0]);
+                // console.log(this.messages);
                 this.user = response.data.user;
                 this.userto = response.data.userto;
                 this.conversation=response.data.conversation
@@ -70,14 +63,14 @@ const app = new Vue({
 
         fetchConversations() {
             axios.get('/conversations').then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 this.conversations = response.data;
             });
         },
         fetchContacts() {
             axios.get('/contacts').then(response => {
                 this.contacts = response.data;
-                console.log(this.contacts);
+                // console.log(this.contacts);
 
             });
         },
