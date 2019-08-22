@@ -60427,12 +60427,14 @@ var app = new Vue({
 
     this.fetchContacts();
     Echo["private"]('chat').listen('MessageSent', function (e) {
-      _this.messages.push({
-        message: e.message.message,
-        photo_url: e.message.photo_url,
-        is_photo: e.message.is_photo,
-        userid: e.user.id
-      });
+      _this.hanleIncoming(e.message);
+
+      console.log(e); // this.messages.push({
+      //     message: e.message.message,
+      //     photo_url: e.message.photo_url,
+      //     is_photo:e.message.is_photo,
+      //     userid: e.user.id
+      // });
     });
   },
   updated: function updated() {
@@ -60447,14 +60449,18 @@ var app = new Vue({
       axios.get('/messages/' + this.contact.id).then(function (response) {
         console.log(response.data);
         _this2.messages = [];
-
-        _this2.messages.push(response.data.conversation[0].messages[0]); // console.log(this.messages);
-
+        _this2.messages = response.data.conversation[0].messages; // console.log(this.messages);
 
         _this2.user = response.data.user;
         _this2.userto = response.data.userto;
-        _this2.conversation = response.data.conversation;
+        _this2.conversation = response.data.conversation[0];
       });
+    },
+    hanleIncoming: function hanleIncoming(message) {
+      if (this.contact && message.conversationId == this.conversation.id) {
+        this.messages.push(message);
+        return;
+      }
     },
     fetchConversations: function fetchConversations() {
       var _this3 = this;
@@ -60475,19 +60481,10 @@ var app = new Vue({
       this.contact = contact;
       this.fetchMessages();
     },
-    // addMessage(message) {
-    //
-    //     this.messages.push(message);
-    //
-    //     axios.post('/messages', {
-    //         message: message,
-    //         conversationId: conversation.id
-    //     }).then(response => {
-    //         console.log(response.data);
-    //     });
-    //},
     // отправляем сообщение на сервер
     sendMessage: function sendMessage(text) {
+      var _this5 = this;
+
       if (!this.contact) {
         return;
       }
@@ -60496,17 +60493,19 @@ var app = new Vue({
         conversation_id: this.conversation.id,
         text: text
       }).then(function (response) {
-        console.log(response.data); // this.$emit('new', response.data);
+        _this5.messages.push(response.data); // console.log(response.data);
+        // this.$emit('new', response.data);
+
       });
     },
     //отправляем файлы на сервер
     update: function update(e) {
-      var _this5 = this;
+      var _this6 = this;
 
       e.preventDefault();
       var photoname = this.gatherFormData();
       axios.post('photo', photoname).then(function (response) {
-        return _this5.messages.push({
+        return _this6.messages.push({
           message: response.data.message.message,
           photo_url: response.data.message.photo_url,
           is_photo: response.data.message.is_photo,

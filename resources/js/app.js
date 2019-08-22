@@ -32,12 +32,14 @@ const app = new Vue({
 
         Echo.private('chat')
             .listen('MessageSent', (e) => {
-                this.messages.push({
-                    message: e.message.message,
-                    photo_url: e.message.photo_url,
-                    is_photo:e.message.is_photo,
-                    userid: e.user.id
-                });
+                this.hanleIncoming(e.message);
+                console.log(e);
+                // this.messages.push({
+                //     message: e.message.message,
+                //     photo_url: e.message.photo_url,
+                //     is_photo:e.message.is_photo,
+                //     userid: e.user.id
+                // });
             });
 
 
@@ -54,12 +56,19 @@ const app = new Vue({
             axios.get('/messages/'+this.contact.id).then(response => {
                 console.log(response.data);
                 this.messages=[];
-                this.messages.push(response.data.conversation[0].messages[0]);
+                this.messages = response.data.conversation[0].messages;
                 // console.log(this.messages);
                 this.user = response.data.user;
                 this.userto = response.data.userto;
-                this.conversation=response.data.conversation;
+                this.conversation=response.data.conversation[0];
+
             });
+        },
+        hanleIncoming(message) {
+            if (this.contact && message.conversationId == this.conversation.id) {
+                this.messages.push(message);
+                return;
+            }
         },
 
         fetchConversations() {
@@ -81,17 +90,6 @@ const app = new Vue({
             this.fetchMessages();
         },
 
-        // addMessage(message) {
-        //
-        //     this.messages.push(message);
-        //
-        //     axios.post('/messages', {
-        //         message: message,
-        //         conversationId: conversation.id
-        //     }).then(response => {
-        //         console.log(response.data);
-        //     });
-        //},
         // отправляем сообщение на сервер
         sendMessage(text) {
             if (!this.contact) {
@@ -101,7 +99,8 @@ const app = new Vue({
                 conversation_id: this.conversation.id,
                 text: text
             }).then((response) => {
-                console.log(response.data);
+                this.messages.push(response.data);
+                // console.log(response.data);
                 // this.$emit('new', response.data);
             })
         },

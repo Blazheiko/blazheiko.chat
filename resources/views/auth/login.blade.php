@@ -53,23 +53,29 @@
 
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
 
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
+                                <p>
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ __('Login') }}
+                                    </button>
+
+                                    @if (Route::has('password.request'))
+                                        <a class="btn btn-link" href="{{ route('password.request') }}">
+                                            {{ __('Forgot Your Password?') }}
+                                        </a>
+                                    @endif
+                                </p>
+
+                                <p>
+                                    <a href="{{url('/facebook/redirect')}}" class="btn btn-primary">Login with Facebook</a>
+                                </p>
+                                <p>
+                                    <a href="{{url('/google/redirect')}}" class="btn btn-primary">Login with Google</a>
+                                </p>
                             </div>
+
                         </div>
-                         <div class="form-group">
-                            <div class="col-md-8 col-md-offset-4">
-                              <a href="{{url('/facebook/redirect')}}" class="btn btn-primary">Login with Facebook</a>
-                                <a href="{{url('/google/redirect')}}" class="btn btn-primary">Login with Google</a>
-                            </div>
-                        </div>
+
                     </form>
                 </div>
             </div>

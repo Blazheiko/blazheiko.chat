@@ -28,6 +28,7 @@ class MessageSent implements ShouldBroadcast
      * @var Message
      */
     public $message;
+//    public $conversationId;
 
 
     //public $photo_url;
@@ -37,11 +38,10 @@ class MessageSent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(User $user, Message $message)
+    public function __construct(User $user, $message)
     {
         $this->user = $user;
         $this->message = $message;
-
     }
 
     /**
