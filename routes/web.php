@@ -50,13 +50,7 @@ Route::post('messages', 'ChatsController@sendMessage');
 Route::get('conversations', 'ChatsController@fetchConversations');
 Route::get('contacts', 'ChatsController@fetchContacts');
 
-Route::post('/photo',            ['as' => 'addphoto',  'uses' =>'UploadPhotoController']);
-
-//Route::get('/facebook/redirect', 'Auth\SocialAuthFacebookController@redirectToProvider');
-//Route::get('/facebook/callback', 'Auth\SocialAuthFacebookController@handleProviderCallback');
-//
-//Route::get('/google/redirect', 'Auth\SocialAuthGoogleController@redirectToProvider');
-//Route::get('/google/callback', 'Auth\SocialAuthGoogleController@handleProviderCallback');
+Route::post('/photo/{id}', ['as' => 'addphoto',  'uses' =>'UploadPhotoController']);
 
 Route::get('/{provider}/redirect', 'Auth\SocialAuthController@redirectToProvider');
 Route::get('/{provider}/callback', 'Auth\SocialAuthController@handleProviderCallback');

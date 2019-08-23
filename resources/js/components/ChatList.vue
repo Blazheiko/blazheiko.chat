@@ -73,7 +73,7 @@
                 cursor: pointer;
 
                 &.selected {
-                    background: #dfdfdf;
+                    background: #d5b69fa6;;
                 }
 
                 span.unread {

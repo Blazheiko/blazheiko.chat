@@ -54,8 +54,7 @@ class ChatsController extends Controller
             $messagesStart['message'] = 'Начало чата с пользователем';
             $messagesStart['photo_url'] = '';
             $messagesStart['is_photo'] = false;
-            $date = new DateTime();
-            $messagesStart['datatime'] = $date->getTimestamp();
+            $messagesNew['datatime'] =''.date("m.d.y").'  '.date("H:i:s");
             $messages[]=$messagesStart;
 
             $conversationStart=new Conversation([
@@ -65,7 +64,6 @@ class ChatsController extends Controller
         }
         $userTo=User::find($id);
         $user = User::find($userId);
-//        dd($messagesStart);
 
         return response(['conversation'=>$conversation,'user'=>$user,'userto'=>$userTo]);
     }
@@ -95,7 +93,6 @@ class ChatsController extends Controller
     public function sendMessage(Request $request)
     {
 //        return response($request);
-//        return ['status' => 'в контроллере'];
         $conversationId=$request->conversation_id;
 
         $user = Auth::user();
@@ -107,8 +104,7 @@ class ChatsController extends Controller
         $messagesNew['photo_url'] = '';
         $messagesNew['is_photo'] = false;
         $messagesNew['conversationId'] = $conversationId;
-        $date = new DateTime();
-        $messagesNew['datatime'] = $date->getTimestamp();
+        $messagesNew['datatime'] =''.date("m.d.y").'  '.date("H:i:s");
         $messages[]=$messagesNew;
         $conversation->messages =$messages;
         $conversation->save();

@@ -32,17 +32,9 @@ const app = new Vue({
 
         Echo.private('chat')
             .listen('MessageSent', (e) => {
-                this.hanleIncoming(e.message);
+                this.handleIncoming(e.message);
                 console.log(e);
-                // this.messages.push({
-                //     message: e.message.message,
-                //     photo_url: e.message.photo_url,
-                //     is_photo:e.message.is_photo,
-                //     userid: e.user.id
-                // });
             });
-
-
     },
     updated(){
         var container =app.$refs.messageDisplay;
@@ -51,22 +43,22 @@ const app = new Vue({
     },
 
     methods: {
-
+        //Запрашиваем у сервера все сообщения по данному контакту
         fetchMessages(contact) {
             axios.get('/messages/'+this.contact.id).then(response => {
                 console.log(response.data);
                 this.messages=[];
                 this.messages = response.data.conversation[0].messages;
-                // console.log(this.messages);
                 this.user = response.data.user;
                 this.userto = response.data.userto;
                 this.conversation=response.data.conversation[0];
 
             });
         },
-        hanleIncoming(message) {
+        //обрабатываем сообщение от пушера
+        handleIncoming(message) {
             if (this.contact && message.conversationId == this.conversation.id) {
-                this.messages.push(message);
+                this.messages.push(message.message);
                 return;
             }
         },
@@ -77,6 +69,7 @@ const app = new Vue({
                 this.conversations = response.data;
             });
         },
+        // запрашиваем у сервера список контактов
         fetchContacts() {
             axios.get('/contacts').then(response => {
                 this.contacts = response.data;
@@ -101,22 +94,21 @@ const app = new Vue({
             }).then((response) => {
                 this.messages.push(response.data);
                 // console.log(response.data);
-                // this.$emit('new', response.data);
             })
         },
         //отправляем файлы на сервер
         update(e) {
+            if (!this.contact) {
+                return;
+            }
             e.preventDefault();
-
             let photoname = this.gatherFormData();
 
-            axios.post('photo', photoname )
-                .then(response => this.messages.push({
-                    message: response.data.message.message,
-                    photo_url: response.data.message.photo_url,
-                    is_photo:response.data.message.is_photo,
-                    user: response.data.user
-                }));
+            axios.post('/photo/'+this.conversation.id,photoname)
+                .then((response) => {
+                    this.messages.push(response.data.message);
+                    console.log(response.data);
+                })
         },
 
         gatherFormData() {

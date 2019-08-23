@@ -20,9 +20,9 @@
                             </strong>
                         </div>
                     </div>
-                    <p>
+                    <strong>
                         {{ message.message }}
-                    </p>
+                    </strong>
                     <p>
                         {{ message.datatime }}
                     </p>

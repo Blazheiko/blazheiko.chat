@@ -19,7 +19,9 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <style>
-
+        html, body {
+            background-color: #e8d276b5;;
+        }
         .row{
             /*width: 900px;*/
             white-space:nowrap;
@@ -86,34 +88,8 @@
             -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
             background-color: #555;
         }
-        /*@import url('https://fonts.googleapis.com/css?family=PT+Sans+Caption');*/
-        /*.top-menu {*/
-            /*margin: 0 60px;*/
-            /*position: relative;*/
-            /*background: #C8C9CE;*/
-            /*box-shadow:*/
-                /*inset 1px 0 0 rgba(255,255,255,.1),*/
-                /*inset -1px 0 0 rgba(255,255,255,.1),*/
-                /*inset 150px 0 150px -150px rgba(255,255,255,.12),*/
-                /*inset -150px 0 150px -150px rgba(255,255,255,.12);*/
-        /*}*/
-        /*.top-menu:before,*/
-        /*.top-menu:after {*/
-            /*content: "";*/
-            /*position: absolute;*/
-            /*z-index: 2;*/
-            /*left: 0;*/
-            /*width: 100%;*/
-            /*height: 3px;*/
-        /*}*/
-        /*.top-menu:before {*/
-            /*top: 0;*/
-            /*border-bottom: 1px dashed rgba(255,255,255,.2);*/
-        /*}*/
-        /*.top-menu:after {*/
-            /*bottom: 0;*/
-            /*border-top: 1px dashed rgba(255,255,255,.2);*/
-        /*}*/
+
+
         .menu-main {
             list-style: none;
             padding: 0;

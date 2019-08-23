@@ -6370,7 +6370,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  /*max-height: 600px;*/\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n  max-height: 700px;\n  width: -webkit-min-content;\n  width: -moz-min-content;\n  width: min-content;\n  overflow: scroll;\n}\n.contacts-list ul[data-v-b89f32fe] {\n  list-style-type: none;\n  padding-left: 0;\n}\n.contacts-list ul li[data-v-b89f32fe] {\n  display: flex;\n  padding: 2px;\n  border-bottom: 1px solid #aaaaaa;\n  height: 80px;\n  position: relative;\n  cursor: pointer;\n}\n.contacts-list ul li.selected[data-v-b89f32fe] {\n  background: #dfdfdf;\n}\n.contacts-list ul li span.unread[data-v-b89f32fe] {\n  background: #82e0a8;\n  color: #fff;\n  position: absolute;\n  right: 11px;\n  top: 20px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li .avatar[data-v-b89f32fe] {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.contacts-list ul li .avatar img[data-v-b89f32fe] {\n  width: 35px;\n  border-radius: 50%;\n  margin: 0 auto;\n}\n.contacts-list ul li .contact[data-v-b89f32fe] {\n  flex: 3;\n  font-size: 10px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.contacts-list ul li .contact p[data-v-b89f32fe] {\n  margin: 0;\n}\n.contacts-list ul li .contact p.name[data-v-b89f32fe] {\n  font-weight: bold;\n}", ""]);
+exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  /*max-height: 600px;*/\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n  max-height: 700px;\n  width: -webkit-min-content;\n  width: -moz-min-content;\n  width: min-content;\n  overflow: scroll;\n}\n.contacts-list ul[data-v-b89f32fe] {\n  list-style-type: none;\n  padding-left: 0;\n}\n.contacts-list ul li[data-v-b89f32fe] {\n  display: flex;\n  padding: 2px;\n  border-bottom: 1px solid #aaaaaa;\n  height: 80px;\n  position: relative;\n  cursor: pointer;\n}\n.contacts-list ul li.selected[data-v-b89f32fe] {\n  background: #d5b69fa6;\n}\n.contacts-list ul li span.unread[data-v-b89f32fe] {\n  background: #82e0a8;\n  color: #fff;\n  position: absolute;\n  right: 11px;\n  top: 20px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li .avatar[data-v-b89f32fe] {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.contacts-list ul li .avatar img[data-v-b89f32fe] {\n  width: 35px;\n  border-radius: 50%;\n  margin: 0 auto;\n}\n.contacts-list ul li .contact[data-v-b89f32fe] {\n  flex: 3;\n  font-size: 10px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.contacts-list ul li .contact p[data-v-b89f32fe] {\n  margin: 0;\n}\n.contacts-list ul li .contact p.name[data-v-b89f32fe] {\n  font-weight: bold;\n}", ""]);
 
 // exports
 
@@ -48179,7 +48179,7 @@ var render = function() {
                     ])
               ]),
               _vm._v(" "),
-              _c("p", [
+              _c("strong", [
                 _vm._v(
                   "\n                " +
                     _vm._s(message.message) +
@@ -60427,14 +60427,9 @@ var app = new Vue({
 
     this.fetchContacts();
     Echo["private"]('chat').listen('MessageSent', function (e) {
-      _this.hanleIncoming(e.message);
+      _this.handleIncoming(e.message);
 
-      console.log(e); // this.messages.push({
-      //     message: e.message.message,
-      //     photo_url: e.message.photo_url,
-      //     is_photo:e.message.is_photo,
-      //     userid: e.user.id
-      // });
+      console.log(e);
     });
   },
   updated: function updated() {
@@ -60443,22 +60438,23 @@ var app = new Vue({
     container.scrollTop = container.scrollHeight;
   },
   methods: {
+    //Запрашиваем у сервера все сообщения по данному контакту
     fetchMessages: function fetchMessages(contact) {
       var _this2 = this;
 
       axios.get('/messages/' + this.contact.id).then(function (response) {
         console.log(response.data);
         _this2.messages = [];
-        _this2.messages = response.data.conversation[0].messages; // console.log(this.messages);
-
+        _this2.messages = response.data.conversation[0].messages;
         _this2.user = response.data.user;
         _this2.userto = response.data.userto;
         _this2.conversation = response.data.conversation[0];
       });
     },
-    hanleIncoming: function hanleIncoming(message) {
+    //обрабатываем сообщение от пушера
+    handleIncoming: function handleIncoming(message) {
       if (this.contact && message.conversationId == this.conversation.id) {
-        this.messages.push(message);
+        this.messages.push(message.message);
         return;
       }
     },
@@ -60470,6 +60466,7 @@ var app = new Vue({
         _this3.conversations = response.data;
       });
     },
+    // запрашиваем у сервера список контактов
     fetchContacts: function fetchContacts() {
       var _this4 = this;
 
@@ -60494,7 +60491,6 @@ var app = new Vue({
         text: text
       }).then(function (response) {
         _this5.messages.push(response.data); // console.log(response.data);
-        // this.$emit('new', response.data);
 
       });
     },
@@ -60502,15 +60498,16 @@ var app = new Vue({
     update: function update(e) {
       var _this6 = this;
 
+      if (!this.contact) {
+        return;
+      }
+
       e.preventDefault();
       var photoname = this.gatherFormData();
-      axios.post('photo', photoname).then(function (response) {
-        return _this6.messages.push({
-          message: response.data.message.message,
-          photo_url: response.data.message.photo_url,
-          is_photo: response.data.message.is_photo,
-          user: response.data.user
-        });
+      axios.post('/photo/' + this.conversation.id, photoname).then(function (response) {
+        _this6.messages.push(response.data.message);
+
+        console.log(response.data);
       });
     },
     gatherFormData: function gatherFormData() {
