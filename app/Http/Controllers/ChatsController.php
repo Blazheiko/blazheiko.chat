@@ -75,9 +75,33 @@ class ChatsController extends Controller
 
     public function fetchContacts()
     {
-        // dd(Conversation::with('user')->get());
+        $user = Auth::user();
+        $conversations =$user->conversations;
+        $contacts = User::where('id', '!=', auth()->id())->get();
+        $listContact=[];
+//        return response($conversations);
+        foreach ($contacts as $contact){
+            $contactTemp['contact'] = $contact;
+            $contactTemp['counter']= 0;
+            $contactTemp['unread']= 0;
+            $contactTemp['last_message_date']=null;
 
-        return User::where('id', '!=', auth()->id())->get();
+            for ($i=0; $i<count($conversations);$i++){
+                if ($contact->id == $conversations[$i]->user_id || $contact->id == $conversations[$i]->user_to_id ){
+                    $contactTemp['counter'] = $conversations[$i]->counter;
+                    $contactTemp['last_message_date']=$conversations[$i]->last_message_date;
+
+                    if ($contact->id == $conversations[$i]->user_id ){
+                        $contactTemp['unread'] = $conversations[$i]->unread;}
+                    else{
+                        $contactTemp['unread'] = $conversations[$i]->unread_to;}
+                    $i=count($conversations);
+                }
+            }
+            $listContact[]=$contactTemp ;
+        }
+
+        return response($listContact);
     }
 
 

@@ -25,19 +25,6 @@ class UploadPhotoController extends Controller
             $messagesNew = $user->messages()->create([
                 'conversation_id'=>$id,'photo_url'=>$filename,'is_photo'=>true
             ]);
-//            $conversation = Conversation::find($id);
-//            $messages = $conversation->messages;
-//            $messagesNew['user_id'] = $user->id;
-//            $messagesNew['message'] = '';
-//            $messagesNew['photo_url'] = $filename;
-//            $messagesNew['is_photo'] = true;
-//            $messagesNew['conversationId'] = $id;
-//            $messagesNew['datatime'] =''.date("m.d.y").'  '.date("H:i:s");
-//            $messages[]=$messagesNew;
-//            $conversation->messages =$messages;
-//            $conversation->save();
-//            return response($request);
-
 
             broadcast(new MessageSent($user, $messagesNew))->toOthers();
 

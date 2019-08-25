@@ -26,7 +26,7 @@
                         ></chat-form>
 
                     </div>
-                    <span>Select New Photo</span>
+                    <span>Отправить фото</span>
                     <input ref="photo" type="file" class="" name="photo" @change="update">
 
                 </div>

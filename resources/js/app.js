@@ -64,18 +64,11 @@ const app = new Vue({
             }
         },
 
-        fetchConversations() {
-            axios.get('/conversations').then(response => {
-                // console.log(response.data);
-                this.conversations = response.data;
-            });
-        },
         // запрашиваем у сервера список контактов
         fetchContacts() {
             axios.get('/contacts').then(response => {
+                console.log(response.data);
                 this.contacts = response.data;
-                // console.log(this.contacts);
-
             });
         },
 

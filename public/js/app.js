@@ -1778,6 +1778,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     contacts: {
@@ -1787,9 +1789,16 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      selected: this.contacts.length ? this.contacts[0] : null
+      selected: null
     };
   },
+  // mounted() {
+  //     console.log('в mounted');
+  //     if (this.contacts.length){
+  //         this.selected = this.contacts[0].contact
+  //     };
+  //     console.log('выбрали '+this.selected)
+  // },
   methods: {
     selectContact: function selectContact(contact) {
       this.selected = contact;
@@ -6384,7 +6393,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  /*max-height: 600px;*/\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n  max-height: 700px;\n  width: -webkit-min-content;\n  width: -moz-min-content;\n  width: min-content;\n  overflow: scroll;\n}\n.contacts-list ul[data-v-b89f32fe] {\n  list-style-type: none;\n  padding-left: 0;\n}\n.contacts-list ul li[data-v-b89f32fe] {\n  display: flex;\n  padding: 2px;\n  border-bottom: 1px solid #aaaaaa;\n  height: 80px;\n  position: relative;\n  cursor: pointer;\n}\n.contacts-list ul li.selected[data-v-b89f32fe] {\n  background: #d5b69fa6;\n}\n.contacts-list ul li span.unread[data-v-b89f32fe] {\n  background: #82e0a8;\n  color: #fff;\n  position: absolute;\n  right: 11px;\n  top: 20px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li .avatar[data-v-b89f32fe] {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.contacts-list ul li .avatar img[data-v-b89f32fe] {\n  width: 35px;\n  border-radius: 50%;\n  margin: 0 auto;\n}\n.contacts-list ul li .contact[data-v-b89f32fe] {\n  flex: 3;\n  font-size: 10px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.contacts-list ul li .contact p[data-v-b89f32fe] {\n  margin: 0;\n}\n.contacts-list ul li .contact p.name[data-v-b89f32fe] {\n  font-weight: bold;\n}", ""]);
+exports.push([module.i, ".contacts-list[data-v-b89f32fe] {\n  flex: 2;\n  /*max-height: 600px;*/\n  overflow: scroll;\n  border-left: 1px solid #a6a6a6;\n  float: left;\n  max-height: 700px;\n  width: -webkit-min-content;\n  width: -moz-min-content;\n  width: min-content;\n  overflow: scroll;\n}\n.contacts-list ul[data-v-b89f32fe] {\n  list-style-type: none;\n  padding-left: 0;\n}\n.contacts-list ul li[data-v-b89f32fe] {\n  display: flex;\n  padding: 2px;\n  border-bottom: 1px solid #aaaaaa;\n  height: 80px;\n  position: relative;\n  cursor: pointer;\n}\n.contacts-list ul li.selected[data-v-b89f32fe] {\n  background: #d5b69fa6;\n}\n.contacts-list ul li span.unread[data-v-b89f32fe] {\n  background: #82e0a8;\n  color: #fff;\n  position: absolute;\n  right: 11px;\n  top: 18px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li a.counter[data-v-b89f32fe] {\n  /*background: #82e0a8;*/\n  /*color: #fff;*/\n  position: absolute;\n  right: 11px;\n  bottom: 5px;\n  display: flex;\n  font-weight: 700;\n  min-width: 20px;\n  justify-content: center;\n  align-items: center;\n  line-height: 20px;\n  font-size: 12px;\n  padding: 0 4px;\n  border-radius: 3px;\n}\n.contacts-list ul li .avatar[data-v-b89f32fe] {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.contacts-list ul li .avatar img[data-v-b89f32fe] {\n  width: 35px;\n  border-radius: 50%;\n  margin: 0 auto;\n}\n.contacts-list ul li .contact[data-v-b89f32fe] {\n  flex: 3;\n  font-size: 10px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.contacts-list ul li .contact p[data-v-b89f32fe] {\n  margin: 0;\n}\n.contacts-list ul li .contact p.name[data-v-b89f32fe] {\n  font-weight: bold;\n}", ""]);
 
 // exports
 
@@ -48137,11 +48146,11 @@ var render = function() {
         return _c(
           "li",
           {
-            key: contact.id,
-            class: { selected: contact == _vm.selected },
+            key: contact.contact.id,
+            class: { selected: contact.contact == _vm.selected },
             on: {
               click: function($event) {
-                return _vm.selectContact(contact)
+                return _vm.selectContact(contact.contact)
               }
             }
           },
@@ -48149,21 +48158,31 @@ var render = function() {
             _c("div", { staticClass: "avatar" }, [
               _c("img", {
                 attrs: {
-                  src: "/uploads/avatars/" + contact.avatar,
+                  src: "/uploads/avatars/" + contact.contact.avatar,
                   alt: contact.name
                 }
               })
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "contact" }, [
-              _c("p", { staticClass: "name" }, [_vm._v(_vm._s(contact.name))]),
+              _c("p", { staticClass: "name" }, [
+                _vm._v(_vm._s(contact.contact.name))
+              ]),
               _vm._v(" "),
-              _c("p", { staticClass: "email" }, [_vm._v(_vm._s(contact.email))])
+              _c("p", { staticClass: "email" }, [
+                _vm._v(_vm._s(contact.contact.email))
+              ])
             ]),
             _vm._v(" "),
             contact.unread
               ? _c("span", { staticClass: "unread" }, [
                   _vm._v(_vm._s(contact.unread))
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            contact.counter
+              ? _c("a", { staticClass: "counter" }, [
+                  _vm._v(_vm._s(contact.counter))
                 ])
               : _vm._e()
           ]
@@ -60569,20 +60588,13 @@ var app = new Vue({
         return;
       }
     },
-    fetchConversations: function fetchConversations() {
-      var _this3 = this;
-
-      axios.get('/conversations').then(function (response) {
-        // console.log(response.data);
-        _this3.conversations = response.data;
-      });
-    },
     // запрашиваем у сервера список контактов
     fetchContacts: function fetchContacts() {
-      var _this4 = this;
+      var _this3 = this;
 
       axios.get('/contacts').then(function (response) {
-        _this4.contacts = response.data; // console.log(this.contacts);
+        console.log(response.data);
+        _this3.contacts = response.data;
       });
     },
     selectedContact: function selectedContact(contact) {
@@ -60591,7 +60603,7 @@ var app = new Vue({
     },
     // отправляем сообщение на сервер
     sendMessage: function sendMessage(text) {
-      var _this5 = this;
+      var _this4 = this;
 
       if (!this.contact) {
         return;
@@ -60603,13 +60615,13 @@ var app = new Vue({
       }).then(function (response) {
         console.log(response.data);
 
-        _this5.messages.push(response.data.message); // console.log(response.data);
+        _this4.messages.push(response.data.message); // console.log(response.data);
 
       });
     },
     //отправляем файлы на сервер
     update: function update(e) {
-      var _this6 = this;
+      var _this5 = this;
 
       if (!this.contact) {
         return;
@@ -60618,7 +60630,7 @@ var app = new Vue({
       e.preventDefault();
       var photoname = this.gatherFormData();
       axios.post('/photo/' + this.conversation.id, photoname).then(function (response) {
-        _this6.messages.push(response.data.message);
+        _this5.messages.push(response.data.message);
 
         console.log(response.data);
       });
