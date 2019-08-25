@@ -59,7 +59,6 @@ const app = new Vue({
         //обрабатываем сообщение от пушера
         handleIncoming(message) {
             if (this.contact && message.conversation_id == this.conversation.id) {
-                console.log('в handleIncoming');
                 this.messages.push(message);
                 return;
             }
