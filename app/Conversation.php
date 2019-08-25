@@ -6,18 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Conversation extends Model
 {
-    protected $fillable = ['user_id','user_to_id','messages'];
+    protected $fillable = ['unread','unread_to','counter','user_to_id','user_id'];
 
-    protected $casts = [
-        'messages' => 'array',
-    ];
 
-//    public function messages()
-//    {
-//        return $this->hasMany(Message::class);
-//    }
+    public function messages()
+    {
+        return $this->hasMany('App\Message');
+    }
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo('App\User');
     }
 }

@@ -18,9 +18,9 @@ const app = new Vue({
     el: '#app',
 
     data: {
-        messages: [],
+        messages:[],
         contacts:[],
-        contact:null,
+        contact :null,
         conversation:null,
         user:null,
         userto:null,
@@ -32,8 +32,9 @@ const app = new Vue({
 
         Echo.private('chat')
             .listen('MessageSent', (e) => {
+                console.log(e.message.conversation_id);
                 this.handleIncoming(e.message);
-                console.log(e);
+
             });
     },
     updated(){
@@ -48,16 +49,17 @@ const app = new Vue({
             axios.get('/messages/'+this.contact.id).then(response => {
                 console.log(response.data);
                 this.messages=[];
-                this.messages = response.data.conversation[0].messages;
+                this.messages = response.data.messages;
                 this.user = response.data.user;
                 this.userto = response.data.userto;
-                this.conversation=response.data.conversation[0];
+                this.conversation=response.data.conversation;
 
             });
         },
         //обрабатываем сообщение от пушера
         handleIncoming(message) {
-            if (this.contact && message.conversationId == this.conversation.id) {
+            if (this.contact && message.conversation_id == this.conversation.id) {
+                console.log('в handleIncoming');
                 this.messages.push(message);
                 return;
             }
@@ -92,7 +94,8 @@ const app = new Vue({
                 conversation_id: this.conversation.id,
                 text: text
             }).then((response) => {
-                this.messages.push(response.data);
+                console.log(response.data);
+                this.messages.push(response.data.message);
                 // console.log(response.data);
             })
         },

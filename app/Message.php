@@ -3,9 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\User;
-use App\Conversation;
-
 
 class Message extends Model
 {
@@ -14,7 +11,7 @@ class Message extends Model
      *
      * @var array
      */
-    protected $fillable = ['message','photo_url','is_photo'];
+    protected $fillable = ['message','photo_url','is_photo','conversation_id'];
 
     /**
      * A message belong to a user
@@ -23,10 +20,11 @@ class Message extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo('App\User');
     }
     public function conversation()
     {
-        return $this->belongsTo(Conversation::class);
+        return $this->belongsTo('App\Conversation');
     }
+
 }

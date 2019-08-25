@@ -43,6 +43,7 @@
         }
 
         .chat li {
+            width: 600px;
             margin-bottom: 10px;
             padding-bottom: 5px;
             border-bottom: 1px dotted #B3A9A9;
@@ -65,7 +66,7 @@
             float:left;
             overflow-y: scroll;
             height: 600px;
-            width: 600px;
+            /*width: 600px;*/
         }
         .panel panel-default{
             width: 600px;
