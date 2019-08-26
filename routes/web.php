@@ -47,6 +47,8 @@ Route::get('/chat', 'ChatsController@index');
 Route::get('messages/{id}', 'ChatsController@fetchMessages');
 Route::post('messages', 'ChatsController@sendMessage');
 
+Route::get('saveUnread/{unread}/{id}', 'ChatsController@saveUnread');
+
 Route::get('conversations', 'ChatsController@fetchConversations');
 Route::get('contacts', 'ChatsController@fetchContacts');
 

@@ -60558,9 +60558,8 @@ var app = new Vue({
 
     this.fetchContacts();
     Echo["private"]('chat').listen('MessageSent', function (e) {
-      console.log(e.message.conversation_id);
-
-      _this.handleIncoming(e.message);
+      // console.log(e.message.conversation_id);
+      _this.handleIncoming(e.message, e.user);
     });
   },
   updated: function updated() {
@@ -60580,27 +60579,49 @@ var app = new Vue({
         _this2.user = response.data.user;
         _this2.userto = response.data.userto;
         _this2.conversation = response.data.conversation;
+
+        _this2.resetUnread();
       });
     },
     //обрабатываем сообщение от пушера
-    handleIncoming: function handleIncoming(message) {
+    handleIncoming: function handleIncoming(message, userFrom) {
       if (this.contact) {
         if (message.conversation_id == this.conversation.id) {
           this.messages.push(message);
-          this.incrementCounter();
+          this.incrementCounter(userFrom.id);
           return;
         } else {
-          for (i = 0; i < this.contacts, length; i++) {}
+          for (i = 0; i < this.contacts.length; i++) {
+            if (this.contacts[i].contact.id == userFrom.id) {
+              this.contacts[i].unread++;
+              this.contacts[i].counter++;
+              this.sendUnread(this.contacts[i].unread, message.conversation_id);
+              return;
+            }
+          }
         }
       }
     },
-    incrementCounter: function incrementCounter() {
+    incrementCounter: function incrementCounter(idUserFrom) {
       for (i = 0; i < this.contacts.length; i++) {
-        if (this.contacts[i].contact.id == this.contact.id) {
+        if (this.contacts[i].contact.id == idUserFrom) {
           this.contacts[i].counter++;
-          return i;
+          return;
         }
       }
+    },
+    resetUnread: function resetUnread() {
+      for (i = 0; i < this.contacts.length; i++) {
+        if (this.contacts[i].contact.id == this.contact.id) {
+          this.contacts[i].unread = 0;
+          return;
+        }
+      }
+    },
+    sendUnread: function sendUnread(unread, conversation_id) {
+      axios.get('/saveUnread/' + unread + '/' + conversation_id).then(function (response) {
+        console.log(response.data);
+      });
     },
     // запрашиваем у сервера список контактов
     fetchContacts: function fetchContacts() {
@@ -60631,7 +60652,7 @@ var app = new Vue({
 
         _this4.messages.push(response.data.message);
 
-        _this4.incrementCounter(); // console.log(response.data);
+        _this4.incrementCounter(_this4.contact.id); // console.log(response.data);
 
       });
     },
@@ -60647,6 +60668,8 @@ var app = new Vue({
       var photoname = this.gatherFormData();
       axios.post('/photo/' + this.conversation.id, photoname).then(function (response) {
         _this5.messages.push(response.data.message);
+
+        _this5.incrementCounter(_this5.contact.id);
 
         console.log(response.data);
       });

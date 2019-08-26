@@ -32,8 +32,8 @@ const app = new Vue({
 
         Echo.private('chat')
             .listen('MessageSent', (e) => {
-                console.log(e.message.conversation_id);
-                this.handleIncoming(e.message);
+                // console.log(e.message.conversation_id);
+                this.handleIncoming(e.message,e.user);
 
             });
     },
@@ -53,33 +53,52 @@ const app = new Vue({
                 this.user = response.data.user;
                 this.userto = response.data.userto;
                 this.conversation=response.data.conversation;
-
+                this.resetUnread();
             });
         },
+
         //обрабатываем сообщение от пушера
-        handleIncoming(message) {
+        handleIncoming(message,userFrom) {
             if (this.contact){
 
                 if (message.conversation_id == this.conversation.id) {
                     this.messages.push(message);
-                    this.incrementCounter();
+                    this.incrementCounter(userFrom.id);
                     return;
                 }
                 else {
-                    for (i=0;i < this.contacts,length;i++){
-
+                    for (i=0;i < this.contacts.length;i++) {
+                        if (this.contacts[i].contact.id == userFrom.id) {
+                            this.contacts[i].unread++;
+                            this.contacts[i].counter++;
+                            this.sendUnread(this.contacts[i].unread,message.conversation_id);
+                            return
+                        }
                     }
                 }
             }
 
         },
-        incrementCounter(){
+        incrementCounter(idUserFrom){
             for (i=0;i < this.contacts.length;i++){
-                if (this.contacts[i].contact.id == this.contact.id){
+                if (this.contacts[i].contact.id == idUserFrom){
                     this.contacts[i].counter ++;
-                    return i
+                    return
                 }
             }
+        },
+        resetUnread(){
+            for (i=0;i < this.contacts.length;i++){
+                if (this.contacts[i].contact.id == this.contact.id){
+                    this.contacts[i].unread =0;
+                    return
+                }
+            }
+        },
+        sendUnread(unread,conversation_id){
+            axios.get('/saveUnread/'+unread+'/'+conversation_id).then(response => {
+                console.log(response.data);
+            });
         },
 
         // запрашиваем у сервера список контактов
@@ -106,7 +125,7 @@ const app = new Vue({
             }).then((response) => {
                 console.log(response.data);
                 this.messages.push(response.data.message);
-                this.incrementCounter();
+                this.incrementCounter(this.contact.id);
                 // console.log(response.data);
             })
         },
@@ -121,6 +140,7 @@ const app = new Vue({
             axios.post('/photo/'+this.conversation.id,photoname)
                 .then((response) => {
                     this.messages.push(response.data.message);
+                    this.incrementCounter(this.contact.id);
                     console.log(response.data);
                 })
         },

@@ -29,11 +29,51 @@ class ChatsController extends Controller
         return view('chat');
     }
 
+
+    //отправляем список контактов
+    public function fetchContacts()
+    {
+        $user = Auth::user();
+        $conversations =Conversation::where('user_id', $user->id)
+            ->orWhere('user_to_id', $user->id)
+            ->get();
+        $contacts = User::where('id', '!=', auth()->id())->get();
+        $listContact=[];
+//        return response($conversations);
+        //делаем список контактов для клиента используя его контакты и список всех пользователей
+        foreach ($contacts as $contact){
+            $contactTemp['contact'] = $contact;
+            $contactTemp['counter'] = 0;
+            $contactTemp['unread'] = 0;
+            $contactTemp['last_message_date']=null;
+            $contactTemp['conversation_id']= null;
+
+            for ($i=0; $i<count($conversations);$i++){
+                if ($contact->id == $conversations[$i]->user_id || $contact->id == $conversations[$i]->user_to_id ){
+                    $contactTemp['conversation_id']= $conversations[$i]->id;
+                    $contactTemp['counter'] = $conversations[$i]->counter;
+                    $contactTemp['last_message_date']=$conversations[$i]->last_message_date;
+
+                    if ($contact->id == $conversations[$i]->user_id ){
+                        $contactTemp['unread'] = $conversations[$i]->unread_to;}
+                    else{
+                        $contactTemp['unread'] = $conversations[$i]->unread;
+                    }
+                    $i=count($conversations);
+                }
+            }
+            $listContact[]=$contactTemp ;
+        }
+
+        return response($listContact);
+    }
+
     /**
      * Fetch all messages (выбираем все сообщения с заданным пользователем)
      *
      * @return Message
      */
+
     public function fetchMessages($id)
     {
         $user = Auth::user();
@@ -59,46 +99,16 @@ class ChatsController extends Controller
         }
         //если диалог есть
         $messages = $conversation -> messages;
+        if ($user->id =$conversation->user_id ){
+            $conversation->unread = 0;
+        }else {
+            $conversation->unread_to = 0;
+        }
+        $conversation->save();
 
         return response(['conversation'=>$conversation,'messages'=>$messages,'user'=>$user,'userto'=>$userTo]);
     }
 
-    //отправляем список контактов
-    public function fetchContacts()
-    {
-        $user = Auth::user();
-        $conversations =Conversation::where('user_id', $user->id)
-            ->orWhere('user_to_id', $user->id)
-            ->get();
-        $contacts = User::where('id', '!=', auth()->id())->get();
-        $listContact=[];
-//        return response($conversations);
-        //делаем список контактов для клиента используя его контакты и список всех пользователей
-        foreach ($contacts as $contact){
-            $contactTemp['contact'] = $contact;
-            $contactTemp['counter']= 0;
-            $contactTemp['unread']= 0;
-            $contactTemp['last_message_date']=null;
-//            $contactTemp['conversation']= null; необходимо будет добавть когда в списке будут только те кто имеют диалоги
-
-            for ($i=0; $i<count($conversations);$i++){
-                if ($contact->id == $conversations[$i]->user_id || $contact->id == $conversations[$i]->user_to_id ){
-//                    $contactTemp['conversation']= $conversations[$i]->id;необходимо будет добавть когда в списке будут только те кто имеют диалоги
-                    $contactTemp['counter'] = $conversations[$i]->counter;
-                    $contactTemp['last_message_date']=$conversations[$i]->last_message_date;
-
-                    if ($contact->id == $conversations[$i]->user_id ){
-                        $contactTemp['unread'] = $conversations[$i]->unread;}
-                    else{
-                        $contactTemp['unread'] = $conversations[$i]->unread_to;}
-                    $i=count($conversations);
-                }
-            }
-            $listContact[]=$contactTemp ;
-        }
-
-        return response($listContact);
-    }
 
 
     /**
@@ -118,5 +128,17 @@ class ChatsController extends Controller
         broadcast(new MessageSent($user, $messagesNew))->toOthers();
 
         return response(['message'=>$messagesNew]);
+    }
+    //
+    public function saveUnread($unread,$id){
+        $user = Auth::user();
+        $conversation = Conversation::find($id);
+        if ($user->id =$conversation->user_id ){
+            $conversation->unread = $unread;
+        }else {
+            $conversation->unread_to = $unread;
+        }
+        $conversation->save();
+        return response('unread - сохранено');
     }
 }
