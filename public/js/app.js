@@ -48184,7 +48184,8 @@ var render = function() {
               ? _c("a", { staticClass: "counter" }, [
                   _vm._v(_vm._s(contact.counter))
                 ])
-              : _vm._e()
+              : _vm._e(),
+            _vm._v(".\n        ")
           ]
         )
       }),
@@ -60583,9 +60584,22 @@ var app = new Vue({
     },
     //обрабатываем сообщение от пушера
     handleIncoming: function handleIncoming(message) {
-      if (this.contact && message.conversation_id == this.conversation.id) {
-        this.messages.push(message);
-        return;
+      if (this.contact) {
+        if (message.conversation_id == this.conversation.id) {
+          this.messages.push(message);
+          this.incrementCounter();
+          return;
+        } else {
+          for (i = 0; i < this.contacts, length; i++) {}
+        }
+      }
+    },
+    incrementCounter: function incrementCounter() {
+      for (i = 0; i < this.contacts.length; i++) {
+        if (this.contacts[i].contact.id == this.contact.id) {
+          this.contacts[i].counter++;
+          return i;
+        }
       }
     },
     // запрашиваем у сервера список контактов
@@ -60615,7 +60629,9 @@ var app = new Vue({
       }).then(function (response) {
         console.log(response.data);
 
-        _this4.messages.push(response.data.message); // console.log(response.data);
+        _this4.messages.push(response.data.message);
+
+        _this4.incrementCounter(); // console.log(response.data);
 
       });
     },

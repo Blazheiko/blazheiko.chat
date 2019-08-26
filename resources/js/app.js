@@ -58,9 +58,27 @@ const app = new Vue({
         },
         //обрабатываем сообщение от пушера
         handleIncoming(message) {
-            if (this.contact && message.conversation_id == this.conversation.id) {
-                this.messages.push(message);
-                return;
+            if (this.contact){
+
+                if (message.conversation_id == this.conversation.id) {
+                    this.messages.push(message);
+                    this.incrementCounter();
+                    return;
+                }
+                else {
+                    for (i=0;i < this.contacts,length;i++){
+
+                    }
+                }
+            }
+
+        },
+        incrementCounter(){
+            for (i=0;i < this.contacts.length;i++){
+                if (this.contacts[i].contact.id == this.contact.id){
+                    this.contacts[i].counter ++;
+                    return i
+                }
             }
         },
 
@@ -88,6 +106,7 @@ const app = new Vue({
             }).then((response) => {
                 console.log(response.data);
                 this.messages.push(response.data.message);
+                this.incrementCounter();
                 // console.log(response.data);
             })
         },

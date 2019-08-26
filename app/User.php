@@ -63,5 +63,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Conversation');
     }
+    public function conversationsTo()
+    {
+        return $this->hasMany('App\Conversation','user_to_id');
+    }
 
 }

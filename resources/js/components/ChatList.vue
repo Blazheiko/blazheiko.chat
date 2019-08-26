@@ -12,7 +12,7 @@
             </div>
 <!--            -->
             <span class="unread" v-if="contact.unread" >{{ contact.unread }}</span>
-            <a class="counter" v-if="contact.counter" >{{ contact.counter }}</a>
+            <a class="counter" v-if="contact.counter" >{{ contact.counter }}</a>.
         </li>
     </ul>
     </div>
