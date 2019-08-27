@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Conversation extends Model
 {
-    protected $fillable = ['unread','unread_to','counter','user_to_id','user_id','last_message_date'];
+    protected $fillable = ['count_read','count_read_to','counter','user_to_id','user_id','last_message_date'];
 
     public function messages()
     {

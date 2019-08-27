@@ -48174,9 +48174,9 @@ var render = function() {
               ])
             ]),
             _vm._v(" "),
-            contact.unread
+            contact.counter - contact.count_read
               ? _c("span", { staticClass: "unread" }, [
-                  _vm._v(_vm._s(contact.unread))
+                  _vm._v(_vm._s(contact.counter - contact.count_read))
                 ])
               : _vm._e(),
             _vm._v(" "),
@@ -60551,7 +60551,8 @@ var app = new Vue({
     conversation: null,
     user: null,
     userto: null,
-    conversationid: 0
+    conversationid: 0,
+    unread: 0
   },
   created: function created() {
     var _this = this;
@@ -60580,7 +60581,15 @@ var app = new Vue({
         _this2.userto = response.data.userto;
         _this2.conversation = response.data.conversation;
 
-        _this2.resetUnread();
+        _this2.resetUnread(); // this.contact.count_read = this.conversation.counter;
+        // this.contact.counter = this.conversation.counter;
+        // console.log(this.contact);
+        // console.log(this.conversation);
+        // if (this.conversation.user_id == this.contact.id){
+        //     this.contact.contact.count_read = this.conversation.count_read
+        // }else {this.contact.count_read = this.conversation.count_read_to }
+        // this.resetUnread();
+
       });
     },
     //обрабатываем сообщение от пушера
@@ -60593,9 +60602,9 @@ var app = new Vue({
         } else {
           for (i = 0; i < this.contacts.length; i++) {
             if (this.contacts[i].contact.id == userFrom.id) {
-              this.contacts[i].unread++;
-              this.contacts[i].counter++;
-              this.sendUnread(this.contacts[i].unread, message.conversation_id);
+              // this.contacts[i].unread++;
+              this.contacts[i].counter++; // this.sendUnread(this.contacts[i].unread,message.conversation_id);
+
               return;
             }
           }
@@ -60606,23 +60615,26 @@ var app = new Vue({
       for (i = 0; i < this.contacts.length; i++) {
         if (this.contacts[i].contact.id == idUserFrom) {
           this.contacts[i].counter++;
+          this.contacts[i].count_read++;
           return;
         }
       }
     },
+    // выравниваем колличество прочитанных и непрочитанных
     resetUnread: function resetUnread() {
       for (i = 0; i < this.contacts.length; i++) {
         if (this.contacts[i].contact.id == this.contact.id) {
-          this.contacts[i].unread = 0;
+          this.contacts[i].count_read = this.conversation.counter;
+          this.contacts[i].counter = this.conversation.counter;
           return;
         }
       }
     },
-    sendUnread: function sendUnread(unread, conversation_id) {
-      axios.get('/saveUnread/' + unread + '/' + conversation_id).then(function (response) {
-        console.log(response.data);
-      });
-    },
+    // sendUnread(unread,conversation_id){
+    //     axios.get('/saveUnread/'+unread+'/'+conversation_id).then(response => {
+    //         console.log(response.data);
+    //     });
+    // },
     // запрашиваем у сервера список контактов
     fetchContacts: function fetchContacts() {
       var _this3 = this;

@@ -24,7 +24,8 @@ const app = new Vue({
         conversation:null,
         user:null,
         userto:null,
-        conversationid:0
+        conversationid:0,
+        unread:0
     },
 
     created() {
@@ -54,6 +55,15 @@ const app = new Vue({
                 this.userto = response.data.userto;
                 this.conversation=response.data.conversation;
                 this.resetUnread();
+                // this.contact.count_read = this.conversation.counter;
+                // this.contact.counter = this.conversation.counter;
+                // console.log(this.contact);
+                // console.log(this.conversation);
+
+                // if (this.conversation.user_id == this.contact.id){
+                //     this.contact.contact.count_read = this.conversation.count_read
+                // }else {this.contact.count_read = this.conversation.count_read_to }
+                // this.resetUnread();
             });
         },
 
@@ -69,9 +79,9 @@ const app = new Vue({
                 else {
                     for (i=0;i < this.contacts.length;i++) {
                         if (this.contacts[i].contact.id == userFrom.id) {
-                            this.contacts[i].unread++;
+                            // this.contacts[i].unread++;
                             this.contacts[i].counter++;
-                            this.sendUnread(this.contacts[i].unread,message.conversation_id);
+                            // this.sendUnread(this.contacts[i].unread,message.conversation_id);
                             return
                         }
                     }
@@ -83,23 +93,26 @@ const app = new Vue({
             for (i=0;i < this.contacts.length;i++){
                 if (this.contacts[i].contact.id == idUserFrom){
                     this.contacts[i].counter ++;
+                    this.contacts[i].count_read ++;
                     return
                 }
             }
         },
+        // выравниваем колличество прочитанных и непрочитанных
         resetUnread(){
             for (i=0;i < this.contacts.length;i++){
                 if (this.contacts[i].contact.id == this.contact.id){
-                    this.contacts[i].unread =0;
+                    this.contacts[i].count_read =this.conversation.counter;
+                    this.contacts[i].counter =this.conversation.counter;
                     return
                 }
             }
         },
-        sendUnread(unread,conversation_id){
-            axios.get('/saveUnread/'+unread+'/'+conversation_id).then(response => {
-                console.log(response.data);
-            });
-        },
+        // sendUnread(unread,conversation_id){
+        //     axios.get('/saveUnread/'+unread+'/'+conversation_id).then(response => {
+        //         console.log(response.data);
+        //     });
+        // },
 
         // запрашиваем у сервера список контактов
         fetchContacts() {

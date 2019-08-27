@@ -11,7 +11,7 @@
                 <p class="email">{{ contact.contact.email }}</p>
             </div>
 <!--            -->
-            <span class="unread" v-if="contact.unread" >{{ contact.unread }}</span>
+            <span class="unread" v-if="contact.counter - contact.count_read" >{{ contact.counter - contact.count_read}}</span>
             <a class="counter" v-if="contact.counter" >{{ contact.counter }}</a>.
         </li>
     </ul>
@@ -24,7 +24,7 @@
             contacts: {
                 type: Array,
                  default: []
-            }
+            },
         },
         data() {
             return {

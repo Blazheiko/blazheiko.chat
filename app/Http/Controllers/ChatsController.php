@@ -44,7 +44,7 @@ class ChatsController extends Controller
         foreach ($contacts as $contact){
             $contactTemp['contact'] = $contact;
             $contactTemp['counter'] = 0;
-            $contactTemp['unread'] = 0;
+            $contactTemp['count_read'] = 0;
             $contactTemp['last_message_date']=null;
             $contactTemp['conversation_id']= null;
 
@@ -55,9 +55,9 @@ class ChatsController extends Controller
                     $contactTemp['last_message_date']=$conversations[$i]->last_message_date;
 
                     if ($contact->id == $conversations[$i]->user_id ){
-                        $contactTemp['unread'] = $conversations[$i]->unread_to;}
+                        $contactTemp['count_read'] = $conversations[$i]->count_read_to;}
                     else{
-                        $contactTemp['unread'] = $conversations[$i]->unread;
+                        $contactTemp['count_read'] = $conversations[$i]->count_read;
                     }
                     $i=count($conversations);
                 }
@@ -99,11 +99,11 @@ class ChatsController extends Controller
         }
         //если диалог есть
         $messages = $conversation -> messages;
-        if ($user->id =$conversation->user_id ){
-            $conversation->unread = 0;
-        }else {
-            $conversation->unread_to = 0;
-        }
+//        return response($user->id = $conversation->user_id)
+        if ($user->id == $conversation->user_id ){
+            $conversation->count_read = $conversation->counter ;
+        }else $conversation->count_read_to = $conversation->counter;
+
         $conversation->save();
 
         return response(['conversation'=>$conversation,'messages'=>$messages,'user'=>$user,'userto'=>$userTo]);
@@ -123,22 +123,30 @@ class ChatsController extends Controller
         $messagesNew = $user->messages()->create([
             'conversation_id'=>$request->conversation_id,'message'=>$request->text
         ]);
-        Conversation::where('id',$request->conversation_id)->increment('counter');
+//        Conversation::where('id',$request->conversation_id)->increment('counter');
+        $conversation = Conversation::find($request->conversation_id);
+        $conversation->counter ++;
+        if ($user->id == $conversation->user_id ){
+            $conversation->count_read = $conversation->counter;
+        }else {
+            $conversation->count_read_to = $conversation->counter;
+        }
+        $conversation->save();
 
         broadcast(new MessageSent($user, $messagesNew))->toOthers();
 
         return response(['message'=>$messagesNew]);
     }
     //
-    public function saveUnread($unread,$id){
-        $user = Auth::user();
-        $conversation = Conversation::find($id);
-        if ($user->id =$conversation->user_id ){
-            $conversation->unread = $unread;
-        }else {
-            $conversation->unread_to = $unread;
-        }
-        $conversation->save();
-        return response('unread - сохранено');
-    }
+//    public function saveUnread($unread,$id){
+//        $user = Auth::user();
+//        $conversation = Conversation::find($id);
+//        if ($user->id =$conversation->user_id ){
+//            $conversation->unread = $unread;
+//        }else {
+//            $conversation->unread_to = $unread;
+//        }
+//        $conversation->save();
+//        return response('unread - сохранено');
+//    }
 }
