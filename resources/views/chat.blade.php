@@ -17,7 +17,8 @@
                     <div  ref='messageDisplay' class="panel-bodychat">
 
                         <chat-messages
-                            :messages="messages" :user="user" :userto="userto"
+                            :messages="messages"
+                            :user="user" :userto="userto"
                         ></chat-messages>
                     </div>
                     <div  class="panel-footer" >
@@ -36,6 +37,11 @@
                         :contacts="contacts"></chat-list>
                 </div>
             </div>
+            <video-chat
+                :conversation="conversation"
+                :contact="contact"
+                :user="user">
+            </video-chat>
 
         </div>
     </div>

@@ -16,9 +16,9 @@ class Conversation extends Model
     {
         return $this->belongsTo('App\User');
     }
-    public function userTo()
+    public function offerVideoChat()
     {
-        return $this->belongsTo('App\User','user_to_id');
+        return $this->hasMany('App\OfferVideoChat');
     }
 
 

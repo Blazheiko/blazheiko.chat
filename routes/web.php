@@ -54,6 +54,8 @@ Route::get('contacts', 'ChatsController@fetchContacts');
 
 Route::post('/photo/{id}', ['as' => 'addphoto',  'uses' =>'UploadPhotoController']);
 
+Route::post('/videoChat/{id}', ['as' => 'videoChat',  'uses' =>'VideoChatController@offer']);
+
 Route::get('/{provider}/redirect', 'Auth\SocialAuthController@redirectToProvider');
 Route::get('/{provider}/callback', 'Auth\SocialAuthController@handleProviderCallback');
 

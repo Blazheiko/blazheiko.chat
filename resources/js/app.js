@@ -13,6 +13,7 @@ Vue.component('chat-messages', require('./components/ChatMessages.vue').default)
 Vue.component('chat-form', require('./components/ChatForm.vue').default);
 Vue.component('chat-list', require('./components/ChatList.vue').default);
 Vue.component('chat-header', require('./components/Header.vue').default);
+Vue.component('video-chat', require('./components/VideoChat.vue').default);
 
 const app = new Vue({
     el: '#app',
@@ -25,7 +26,7 @@ const app = new Vue({
         user:null,
         userto:null,
         conversationid:0,
-        unread:0
+        unread:0,
     },
 
     created() {
@@ -55,15 +56,6 @@ const app = new Vue({
                 this.userto = response.data.userto;
                 this.conversation=response.data.conversation;
                 this.resetUnread();
-                // this.contact.count_read = this.conversation.counter;
-                // this.contact.counter = this.conversation.counter;
-                // console.log(this.contact);
-                // console.log(this.conversation);
-
-                // if (this.conversation.user_id == this.contact.id){
-                //     this.contact.contact.count_read = this.conversation.count_read
-                // }else {this.contact.count_read = this.conversation.count_read_to }
-                // this.resetUnread();
             });
         },
 
@@ -108,12 +100,10 @@ const app = new Vue({
                 }
             }
         },
-        // sendUnread(unread,conversation_id){
-        //     axios.get('/saveUnread/'+unread+'/'+conversation_id).then(response => {
-        //         console.log(response.data);
-        //     });
-        // },
+        startVideoChat(){
+            video_is = true;
 
+        },
         // запрашиваем у сервера список контактов
         fetchContacts() {
             axios.get('/contacts').then(response => {

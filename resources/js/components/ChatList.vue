@@ -28,16 +28,25 @@
         },
         data() {
             return {
-                selected: null
+                selected:null
             };
         },
-        // mounted() {
-        //     console.log('в mounted');
-        //     if (this.contacts.length){
-        //         this.selected = this.contacts[0].contact
-        //     };
-        //     console.log('выбрали '+this.selected)
-        // },
+        mounted: function () {
+            this.$nextTick(function () {
+                // Код, который будет запущен только после
+                // отображения всех представлений
+                // console.log('в mounted');
+                // if (this.contacts.length){
+                //     this.selected = this.contacts[0].contact
+                //         };
+            })
+        },
+
+        updated(){
+            if (this.selected == null && this.contacts.length){
+                this.selectContact(this.contacts[0].contact)
+            }
+        },
 
         methods: {
 
@@ -47,14 +56,14 @@
             }
         },
         computed: {
-            sortedContacts() {
-                return _.sortBy(this.contacts, [(contact) => {
-                    if (contact == this.selected) {
-                        return Infinity;
-                    }
-                    return contact.unread;
-                }]).reverse();
-            }
+            // sortedContacts() {
+            //     return _.sortBy(this.contacts, [(contact) => {
+            //         if (contact == this.selected) {
+            //             return Infinity;
+            //         }
+            //         return contact.unread;
+            //     }]).reverse();
+            // }
         }
     }
 </script>
