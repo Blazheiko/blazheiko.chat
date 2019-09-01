@@ -1959,6 +1959,7 @@ __webpack_require__.r(__webpack_exports__);
     startVideoChat: function startVideoChat() {
       var _this = this;
 
+      this.showMyFace();
       this.yourId = this.user.id;
       this.senderId = this.contact.id; // this.yourVideo = document.getElementById("yourVideo");
 
@@ -1967,28 +1968,40 @@ __webpack_require__.r(__webpack_exports__);
       this.yourVideo = this.$refs.friendsVideo;
       var servers = {
         'iceServers': [{
-          'urls': 'stun:stun.services.mozilla.com'
-        }, {
           'urls': 'stun:stun.l.google.com:19302'
+        }, {
+          'urls': 'stun:stun.services.mozilla.com'
         }, {
           'urls': 'turn:numb.viagenie.ca',
           'credential': 'webrtc',
           'username': 'websitebeaver@mail.com'
         }]
       };
+      console.log(servers);
       this.pc = new RTCPeerConnection(servers);
+      console.log(this.pc);
 
       this.pc.onicecandidate = function (event) {
-        return event.candidate ? _this.sendMessage(JSON.stringify({
-          'ice': event.candidate
-        })) : console.log("Sent All Ice");
-      };
+        if (event.candidate) {
+          _this.sendMessage(JSON.stringify({
+            'ice': event.candidate
+          }));
 
-      this.pc.onaddstream = function (event) {
+          console.log(JSON.stringify({
+            'ice': event.candidate
+          }));
+        } else {
+          console.log("Sent All Ice " + event.candidate);
+        }
+      }; // this.pc.onicecandidate = (event =>
+      //     event.candidate?this.sendMessage( JSON.stringify({'ice': event.candidate})):console.log("Sent All Ice") );
+
+
+      this.pc.ontrack = function (event) {
         return _this.friendsVideo.srcObject = event.stream;
-      };
+      }; // this.showMyFace();
 
-      this.showMyFace();
+
       this.showFriendsFace();
     },
     sendMessage: function sendMessage(data) {
@@ -2022,28 +2035,70 @@ __webpack_require__.r(__webpack_exports__);
     // database.on('child_added', readMessage);
     showMyFace: function showMyFace() {
       console.log('in showMyFace');
-      navigator.getWebcam = navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+      this.yourVideo = this.$refs.yourVideo; // for test
 
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true
-        }).then(function (stream) {//Display the video stream in the video object
-        })["catch"](function (e) {
-          logError(e.name + ": " + e.message);
-        });
-      } else {
-        navigator.getWebcam({
-          audio: true,
-          video: true
-        }, function (stream) {//Display the video stream in the video object
-        }, function () {
-          logError("Web cam is not accessible.");
-        });
-      } // navigator.mediaDevices.getUserMedia({audio:true, video:true})
+      this.yourVideo.srcObject = null; // let getUserMedia =
+      //     navigator.getUserMedia ||
+      //     navigator.webkitGetUserMedia ||
+      //     navigator.mozGetUserMedia ||
+      //     navigator.msGetUserMedia ||
+      //     navigator.oGetUserMedia;
+
+      navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: {
+          width: {
+            exact: 320
+          },
+          height: {
+            exact: 240
+          }
+        }
+      }).then(function (stream) {
+        this.yourVideo.srcObject = stream;
+      })["catch"](function (e) {
+        alert('getUserMedia() error: ' + e.name);
+      }); //     navigator.getUserMedia(
+      //     // Настройки
+      //     {video: true},
+      //     // Колбэк для успешной операции
+      //     function(stream){
+      //         // Создаём объект для видео потока и
+      //         // запускаем его в HTLM элементе video.
+      //         this.yourVideo.src = window.URL.createObjectURL(stream);
+      //         // Воспроизводим видео.
+      //         this.yourVideo.play();
+      //     },
+      //     // Колбэк для не успешной операции
+      //     function(err){
+      //         // Наиболее частые ошибки — PermissionDenied и DevicesNotFound.
+      //         console.error(err);
+      //     }
+      // );
+      //|| navigator.mozGetUserMedia
+      //  navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices);
+      // if (navigator.getWebcam.getUserMedia) {
+      //     navigator.getWebcam.getUserMedia({  audio: true, video: true })
+      //         .then(function (stream) {
+      //             //Display the video stream in the video object
+      //             this.yourVideo.srcObject = window.URL.createObjectURL(stream);
+      //             this.yourVideo.play();
+      //             console.log('в условии внутри ');
+      //
+      //         })
+      //         .catch(function (e) { console.log('в условии  '+ e.name + ': ' + e.message +navigator.mediaDevices.getUserMedia); });
+      // }
+      // else {
+      //     navigator.getWebcam({ audio: true, video: true },
+      //         function (stream) {
+      //             //Display the video stream in the video object
+      //             this.yourVideo.srcObject = stream
+      //         },
+      //          console.log("Web cam is not accessible.") )
+      // }
+      // navigator.mediaDevices.getUserMedia({audio:true, video:true})
       //     .then(stream => this.yourVideo.srcObject = stream)
       //     .then(stream => this.pc.addStream(stream));
-
     },
     showFriendsFace: function showFriendsFace() {
       var _this3 = this;
@@ -48665,7 +48720,7 @@ var render = function() {
         attrs: { type: "button" },
         on: {
           click: function($event) {
-            return _vm.startVideoChat()
+            return _vm.showMyFace()
           }
         }
       },

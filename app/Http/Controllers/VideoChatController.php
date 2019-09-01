@@ -28,7 +28,7 @@ class VideoChatController extends Controller
 //        Conversation::where('id',$request->conversation_id)->increment('counter');
         $conversation = Conversation::find($id);
 
-        $conversation->offerVideoChat()->create(['offer'=>$request->all()]);
+        $conversation->offerVideoChat()->create(['offer'=>$request->ice]);
 
         $conversation->counter ++;
         if ($user->id == $conversation->user_id ){
