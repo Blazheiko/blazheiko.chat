@@ -1792,14 +1792,14 @@ __webpack_require__.r(__webpack_exports__);
       selected: null
     };
   },
-  mounted: function mounted() {
-    this.$nextTick(function () {// Код, который будет запущен только после
-      // отображения всех представлений
-      // console.log('в mounted');
-      // if (this.contacts.length){
-      //     this.selected = this.contacts[0].contact
-      //         };
-    });
+  mounted: function mounted() {// this.$nextTick(function () {
+    //     // Код, который будет запущен только после
+    //     // отображения всех представлений
+    //     // console.log('в mounted');
+    //     // if (this.contacts.length){
+    //     //     this.selected = this.contacts[0].contact
+    //     //         };
+    // })
   },
   updated: function updated() {
     if (this.selected == null && this.contacts.length) {
@@ -1943,7 +1943,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "VideoChat",
-  props: ['user', 'contact', 'conversation'],
+  props: ['user', 'contact', 'conversation', 'msgvideochat', 'is_video'],
   data: function data() {
     return {
       selected: null,
@@ -1951,21 +1951,39 @@ __webpack_require__.r(__webpack_exports__);
       friendsVideo: null,
       pc: null,
       yourId: null,
-      senderId: null
+      senderId: null,
+      start: false
     };
   },
   mounted: function mounted() {},
+  watch: {
+    msgvideochat: function msgvideochat() {
+      this.readMessage();
+    },
+    is_video: function is_video() {
+      this.startVideoChat();
+    }
+  },
   methods: {
     startVideoChat: function startVideoChat() {
       var _this = this;
 
-      this.showMyFace();
+      console.log('выполняем startVideoChat');
+
+      if (this.start) {
+        return;
+      }
+
+      ;
+      this.start = true;
       this.yourId = this.user.id;
-      this.senderId = this.contact.id; // this.yourVideo = document.getElementById("yourVideo");
+      this.senderId = this.contact.id;
+      this.yourVideo = this.$refs.yourVideo; // for test
 
-      this.yourVideo = this.$refs.yourVideo; // this.friendsVideo = document.getElementById("friendsVideo");
+      this.yourVideo.srcObject = null;
+      this.friendsVideo = this.$refs.friendsVideo; // for test
 
-      this.yourVideo = this.$refs.friendsVideo;
+      this.friendsVideo.srcObject = null;
       var servers = {
         'iceServers': [{
           'urls': 'stun:stun.l.google.com:19302'
@@ -1976,10 +1994,10 @@ __webpack_require__.r(__webpack_exports__);
           'credential': 'webrtc',
           'username': 'websitebeaver@mail.com'
         }]
-      };
-      console.log(servers);
+      }; // console.log(servers);
+
       this.pc = new RTCPeerConnection(servers);
-      console.log(this.pc);
+      this.showMyFace(); // console.log(this.pc);
 
       this.pc.onicecandidate = function (event) {
         if (event.candidate) {
@@ -1987,9 +2005,7 @@ __webpack_require__.r(__webpack_exports__);
             'ice': event.candidate
           }));
 
-          console.log(JSON.stringify({
-            'ice': event.candidate
-          }));
+          console.log(JSON.stringify('отправляем ICE кандидатов'));
         } else {
           console.log("Sent All Ice " + event.candidate);
         }
@@ -2004,29 +2020,34 @@ __webpack_require__.r(__webpack_exports__);
 
       this.showFriendsFace();
     },
+    offerVideoChat: function offerVideoChat() {
+      console.log('выполняем offerVideoChat()');
+      axios.get('/offerVideoChat/' + this.conversation.id).then(function (response) {
+        console.log(response.data);
+      });
+      this.startVideoChat();
+    },
     sendMessage: function sendMessage(data) {
       // var msg = database.push({ sender: senderId, message: data });
       // msg.remove();
       axios.post('/videoChat/' + this.conversation.id, data).then(function (response) {
-        // this.messages.push(response.data.message);
-        // this.incrementCounter(this.contact.id);
-        console.log(response.data);
+        console.log('сообщение отправлено');
       });
       return;
     },
-    readMessage: function readMessage(data) {
+    readMessage: function readMessage() {
       var _this2 = this;
 
-      var msg = JSON.parse(data.val().message);
-      var sender = data.val().sender;
+      console.log('выполняем readMessage()');
+      var msg = JSON.parse(this.msgVideo); // var sender = data.val().sender;
 
-      if (sender != this.yourId) {
+      if (this.is_video) {
         if (msg.ice != undefined) this.pc.addIceCandidate(new RTCIceCandidate(msg.ice));else if (msg.sdp.type == "offer") this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)).then(function () {
           return _this2.pc.createAnswer();
         }).then(function (answer) {
           return _this2.pc.setLocalDescription(answer);
         }).then(function () {
-          return sendMessage(yourId, JSON.stringify({
+          return sendMessage(JSON.stringify({
             'sdp': _this2.pc.localDescription
           }));
         });else if (msg.sdp.type == "answer") this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
@@ -2034,80 +2055,28 @@ __webpack_require__.r(__webpack_exports__);
     },
     // database.on('child_added', readMessage);
     showMyFace: function showMyFace() {
-      console.log('in showMyFace');
-      this.yourVideo = this.$refs.yourVideo; // for test
-
-      this.yourVideo.srcObject = null; // let getUserMedia =
-      //     navigator.getUserMedia ||
-      //     navigator.webkitGetUserMedia ||
-      //     navigator.mozGetUserMedia ||
-      //     navigator.msGetUserMedia ||
-      //     navigator.oGetUserMedia;
-
-      navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: {
-          width: {
-            exact: 320
-          },
-          height: {
-            exact: 240
-          }
-        }
-      }).then(function (stream) {
-        this.yourVideo.srcObject = stream;
-      })["catch"](function (e) {
-        alert('getUserMedia() error: ' + e.name);
-      }); //     navigator.getUserMedia(
-      //     // Настройки
-      //     {video: true},
-      //     // Колбэк для успешной операции
-      //     function(stream){
-      //         // Создаём объект для видео потока и
-      //         // запускаем его в HTLM элементе video.
-      //         this.yourVideo.src = window.URL.createObjectURL(stream);
-      //         // Воспроизводим видео.
-      //         this.yourVideo.play();
-      //     },
-      //     // Колбэк для не успешной операции
-      //     function(err){
-      //         // Наиболее частые ошибки — PermissionDenied и DevicesNotFound.
-      //         console.error(err);
-      //     }
-      // );
-      //|| navigator.mozGetUserMedia
-      //  navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices);
-      // if (navigator.getWebcam.getUserMedia) {
-      //     navigator.getWebcam.getUserMedia({  audio: true, video: true })
-      //         .then(function (stream) {
-      //             //Display the video stream in the video object
-      //             this.yourVideo.srcObject = window.URL.createObjectURL(stream);
-      //             this.yourVideo.play();
-      //             console.log('в условии внутри ');
-      //
-      //         })
-      //         .catch(function (e) { console.log('в условии  '+ e.name + ': ' + e.message +navigator.mediaDevices.getUserMedia); });
-      // }
-      // else {
-      //     navigator.getWebcam({ audio: true, video: true },
-      //         function (stream) {
-      //             //Display the video stream in the video object
-      //             this.yourVideo.srcObject = stream
-      //         },
-      //          console.log("Web cam is not accessible.") )
-      // }
-      // navigator.mediaDevices.getUserMedia({audio:true, video:true})
-      //     .then(stream => this.yourVideo.srcObject = stream)
-      //     .then(stream => this.pc.addStream(stream));
-    },
-    showFriendsFace: function showFriendsFace() {
       var _this3 = this;
 
+      console.log('in showMyFace');
+      navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+      }).then(function (stream) {
+        return _this3.yourVideo.srcObject = stream;
+      }).then(function (stream) {
+        return _this3.pc.addStream(stream);
+      });
+      return;
+    },
+    showFriendsFace: function showFriendsFace() {
+      var _this4 = this;
+
+      console.log('in showFriendsFace');
       this.pc.createOffer().then(function (offer) {
-        return _this3.pc.setLocalDescription(offer);
+        return _this4.pc.setLocalDescription(offer);
       }).then(function () {
-        return _this3.sendMessage(_this3.yourId, JSON.stringify({
-          'sdp': _this3.pc.localDescription
+        return _this4.sendMessage(JSON.stringify({
+          'sdp': _this4.pc.localDescription
         }));
       });
     }
@@ -6649,7 +6618,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\nvideo[data-v-737f9f18] {\n    background-color: #faf2cc;\n    border-radius: 7px;\n    margin: 10px 0px 0px 10px;\n    width: 400px;\n    height: 293px;\n}\nbutton[data-v-737f9f18] {\n    margin: 5px 0px 0px 10px !important;\n    width: 810px;\n}\n\n", ""]);
+exports.push([module.i, "\nvideo[data-v-737f9f18] {\n    background-color: #faf2cc;\n    border-radius: 15px;\n    margin: 10px 0px 0px 10px;\n    width: 400px;\n    height: 260px;\n}\nbutton[data-v-737f9f18] {\n    margin: 5px 0px 0px 10px !important;\n    width: 810px;\n}\n\n", ""]);
 
 // exports
 
@@ -48720,7 +48689,7 @@ var render = function() {
         attrs: { type: "button" },
         on: {
           click: function($event) {
-            return _vm.showMyFace()
+            return _vm.offerVideoChat()
           }
         }
       },
@@ -60909,7 +60878,9 @@ var app = new Vue({
     user: null,
     userto: null,
     conversationid: 0,
-    unread: 0
+    unread: 0,
+    msgvideochat: null,
+    is_video: false
   },
   created: function created() {
     var _this = this;
@@ -60944,10 +60915,20 @@ var app = new Vue({
     //обрабатываем сообщение от пушера
     handleIncoming: function handleIncoming(message, userFrom) {
       if (this.contact) {
+        console.log(message);
+
         if (message.conversation_id == this.conversation.id) {
-          this.messages.push(message);
-          this.incrementCounter(userFrom.id);
-          return;
+          if (message.is_video) {
+            if (message.is_video && message.is_photo) {
+              this.is_video = true;
+            } else {
+              this.msgVideo = message.message;
+            }
+          } else {
+            this.messages.push(message);
+            this.incrementCounter(userFrom.id);
+            return;
+          }
         } else {
           for (i = 0; i < this.contacts.length; i++) {
             if (this.contacts[i].contact.id == userFrom.id) {

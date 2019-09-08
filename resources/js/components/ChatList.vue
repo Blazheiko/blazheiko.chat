@@ -32,14 +32,14 @@
             };
         },
         mounted: function () {
-            this.$nextTick(function () {
-                // Код, который будет запущен только после
-                // отображения всех представлений
-                // console.log('в mounted');
-                // if (this.contacts.length){
-                //     this.selected = this.contacts[0].contact
-                //         };
-            })
+            // this.$nextTick(function () {
+            //     // Код, который будет запущен только после
+            //     // отображения всех представлений
+            //     // console.log('в mounted');
+            //     // if (this.contacts.length){
+            //     //     this.selected = this.contacts[0].contact
+            //     //         };
+            // })
         },
 
         updated(){

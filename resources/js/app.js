@@ -27,6 +27,8 @@ const app = new Vue({
         userto:null,
         conversationid:0,
         unread:0,
+        msgvideochat:null,
+        is_video:false
     },
 
     created() {
@@ -36,7 +38,6 @@ const app = new Vue({
             .listen('MessageSent', (e) => {
                 // console.log(e.message.conversation_id);
                 this.handleIncoming(e.message,e.user);
-
             });
     },
     updated(){
@@ -62,11 +63,20 @@ const app = new Vue({
         //обрабатываем сообщение от пушера
         handleIncoming(message,userFrom) {
             if (this.contact){
-
+                console.log(message);
                 if (message.conversation_id == this.conversation.id) {
-                    this.messages.push(message);
-                    this.incrementCounter(userFrom.id);
-                    return;
+                    if (message.is_video){
+                        if (message.is_video && message.is_photo){
+                            this.is_video=true;
+                        }else {
+                            this.msgVideo = message.message;
+                        }
+                    }else {
+                        this.messages.push(message);
+                        this.incrementCounter(userFrom.id);
+                        return;
+                    }
+
                 }
                 else {
                     for (i=0;i < this.contacts.length;i++) {

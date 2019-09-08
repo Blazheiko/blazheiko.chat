@@ -4,7 +4,7 @@
         <video id="yourVideo" ref="yourVideo"  autoplay muted></video>
         <video id="friendsVideo" ref="friendsVideo" autoplay></video>
         <br />
-        <button @click="showMyFace()" type="button" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span> Call</button>
+        <button @click="offerVideoChat()" type="button" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span> Call</button>
     </div>
 
 
@@ -13,7 +13,7 @@
 <script>
     export default {
         name: "VideoChat",
-        props: ['user','contact','conversation'],
+        props: ['user','contact','conversation','msgvideochat','is_video'],
         data() {
             return {
                 selected: null,
@@ -22,6 +22,7 @@
                 pc:null,
                 yourId:null,
                 senderId:null,
+                start:false
             };
         },
 
@@ -29,23 +30,38 @@
 
 
         },
+
+        watch: {
+            msgvideochat: function () {
+                this.readMessage() ;
+            },
+            is_video: function () {
+                this.startVideoChat();
+            },
+        },
+
         methods: {
             startVideoChat(){
-                this.showMyFace();
+                console.log('выполняем startVideoChat');
+                if(this.start){
+                    return
+                };
+                this.start = true;
                 this.yourId = this.user.id;
                 this.senderId = this.contact.id;
-                // this.yourVideo = document.getElementById("yourVideo");
-                this.yourVideo = this.$refs.yourVideo;
-                // this.friendsVideo = document.getElementById("friendsVideo");
-                this.yourVideo = this.$refs.friendsVideo;
+                this.yourVideo = this.$refs.yourVideo;// for test
+                this.yourVideo.srcObject = null;
+                this.friendsVideo = this.$refs.friendsVideo;// for test
+                this.friendsVideo.srcObject = null;
                 let servers = {'iceServers': [ {'urls': 'stun:stun.l.google.com:19302'},{'urls': 'stun:stun.services.mozilla.com'}, {'urls': 'turn:numb.viagenie.ca','credential': 'webrtc','username': 'websitebeaver@mail.com'}]};
-                console.log(servers);
+                // console.log(servers);
                 this.pc = new RTCPeerConnection(servers);
-                console.log(this.pc);
+                this.showMyFace();
+                // console.log(this.pc);
                 this.pc.onicecandidate = (event => {
                     if (event.candidate) {
                         this.sendMessage(JSON.stringify({'ice': event.candidate}));
-                        console.log(JSON.stringify({'ice': event.candidate}));
+                        console.log(JSON.stringify('отправляем ICE кандидатов'));
                     } else {
                         console.log("Sent All Ice " + event.candidate)
                     }
@@ -58,29 +74,39 @@
                 this.showFriendsFace();
 
             },
-                sendMessage( data) {
+
+            offerVideoChat(){
+                console.log('выполняем offerVideoChat()');
+                axios.get('/offerVideoChat/'+this.conversation.id)
+                    .then((response) => {
+                        console.log(response.data);
+                    });
+                this.startVideoChat();
+            },
+
+
+            sendMessage( data) {
                 // var msg = database.push({ sender: senderId, message: data });
                 // msg.remove();
                     axios.post('/videoChat/'+this.conversation.id,data)
                         .then((response) => {
-                            // this.messages.push(response.data.message);
-                            // this.incrementCounter(this.contact.id);
-                            console.log(response.data);
+                            console.log('сообщение отправлено');
                         })
                     return;
                  },
 
-                readMessage(data) {
-                    var msg = JSON.parse(data.val().message);
-                    var sender = data.val().sender;
-                    if (sender != this.yourId) {
+                readMessage() {
+                    console.log('выполняем readMessage()');
+                    let msg = JSON.parse(this.msgVideo);
+                    // var sender = data.val().sender;
+                    if (this.is_video) {
                         if (msg.ice != undefined)
                             this.pc.addIceCandidate(new RTCIceCandidate(msg.ice));
                         else if (msg.sdp.type == "offer")
                             this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp))
                                 .then(() => this.pc.createAnswer())
                                 .then(answer => this.pc.setLocalDescription(answer))
-                                .then(() => sendMessage(yourId, JSON.stringify({'sdp': this.pc.localDescription})));
+                                .then(() => sendMessage(JSON.stringify({'sdp': this.pc.localDescription})));
                         else if (msg.sdp.type == "answer")
                             this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
                     }
@@ -90,82 +116,19 @@
 
                 showMyFace() {
                     console.log('in showMyFace');
-                    this.yourVideo = this.$refs.yourVideo;// for test
-                    this.yourVideo.srcObject = null;
 
-                    // let getUserMedia =
-                    //     navigator.getUserMedia ||
-                    //     navigator.webkitGetUserMedia ||
-                    //     navigator.mozGetUserMedia ||
-                    //     navigator.msGetUserMedia ||
-                    //     navigator.oGetUserMedia;
+                    navigator.mediaDevices.getUserMedia({audio:true, video:true})
+                         .then(stream => this.yourVideo.srcObject = stream)
+                         .then(stream => this.pc.addStream(stream));
+                    return;
 
-                    navigator.mediaDevices.getUserMedia({
-                        audio: true,
-                        video: {
-                            width: {
-                                exact: 320
-                            },
-                            height: {
-                                exact: 240
-                            }
-                        }
-                    }).then(function (stream) {
-                            this.yourVideo.srcObject = stream;
-                    }).catch(function(e) {
-                            alert('getUserMedia() error: ' + e.name);
-                        });
-
-                //     navigator.getUserMedia(
-                //     // Настройки
-                //     {video: true},
-                //     // Колбэк для успешной операции
-                //     function(stream){
-                //         // Создаём объект для видео потока и
-                //         // запускаем его в HTLM элементе video.
-                //         this.yourVideo.src = window.URL.createObjectURL(stream);
-                //         // Воспроизводим видео.
-                //         this.yourVideo.play();
-                //     },
-                //     // Колбэк для не успешной операции
-                //     function(err){
-                //         // Наиболее частые ошибки — PermissionDenied и DevicesNotFound.
-                //         console.error(err);
-                //     }
-                // );
-                    //|| navigator.mozGetUserMedia
-
-                    //  navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices);
-                    // if (navigator.getWebcam.getUserMedia) {
-                    //     navigator.getWebcam.getUserMedia({  audio: true, video: true })
-                    //         .then(function (stream) {
-                    //             //Display the video stream in the video object
-                    //             this.yourVideo.srcObject = window.URL.createObjectURL(stream);
-                    //             this.yourVideo.play();
-                    //             console.log('в условии внутри ');
-                    //
-                    //         })
-                    //         .catch(function (e) { console.log('в условии  '+ e.name + ': ' + e.message +navigator.mediaDevices.getUserMedia); });
-                    // }
-                    // else {
-                    //     navigator.getWebcam({ audio: true, video: true },
-                    //         function (stream) {
-                    //             //Display the video stream in the video object
-                    //             this.yourVideo.srcObject = stream
-                    //         },
-                    //          console.log("Web cam is not accessible.") )
-                    // }
-
-
-                    // navigator.mediaDevices.getUserMedia({audio:true, video:true})
-                    //     .then(stream => this.yourVideo.srcObject = stream)
-                    //     .then(stream => this.pc.addStream(stream));
                 },
 
                 showFriendsFace() {
+                    console.log('in showFriendsFace');
                     this.pc.createOffer()
                         .then(offer => this.pc.setLocalDescription(offer) )
-                        .then(() => this.sendMessage(this.yourId, JSON.stringify({'sdp': this.pc.localDescription})) );
+                        .then(() => this.sendMessage( JSON.stringify({'sdp': this.pc.localDescription})) );
                 }
 
         }
@@ -177,10 +140,10 @@
 <style scoped>
     video {
         background-color: #faf2cc;
-        border-radius: 7px;
+        border-radius: 15px;
         margin: 10px 0px 0px 10px;
         width: 400px;
-        height: 293px;
+        height: 260px;
     }
     button {
         margin: 5px 0px 0px 10px !important;

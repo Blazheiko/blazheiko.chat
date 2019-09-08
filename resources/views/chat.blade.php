@@ -40,7 +40,9 @@
             <video-chat
                 :conversation="conversation"
                 :contact="contact"
-                :user="user">
+                :user="user"
+                :msgvideochat="msgvideochat"
+                :is_video="is_video">
             </video-chat>
 
         </div>
