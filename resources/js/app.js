@@ -74,9 +74,8 @@ const app = new Vue({
                               console.log('пришло ice');
                               this.ice = message.ice;
                               }else {
-
                               this.sdp = message.sdp;
-                            console.log('пришло sdp'+ this.sdp);
+                              console.log('пришло sdp'+ this.sdp);
                               }
                         }
                     }else {

@@ -59,16 +59,36 @@
                 this.yourVideo.srcObject = null;
                 this.friendsVideo = this.$refs.friendsVideo;// for test
                 this.friendsVideo.srcObject = null;
-                let servers = {'iceServers': [ {'urls': 'stun:stun.l.google.com:19302'},{'urls': 'stun:stun.services.mozilla.com'}, {'urls': 'turn:numb.viagenie.ca','credential': 'webrtc','username': 'websitebeaver@mail.com'}]};
+                const servers = {'iceServers': [ {'urls': 'stun:stun.l.google.com:19302'},{'urls': 'stun:stun.services.mozilla.com'}, {'urls': 'turn:numb.viagenie.ca','credential': 'webrtc','username': 'websitebeaver@mail.com'}]};
                 // console.log(servers);
                 this.pc = new RTCPeerConnection(servers);
                 this.showMyFace();
-                // console.log(this.pc);
+                 console.log('перед pc.onicecandidate');
+                this.pc.onicecandidate = (event => {
+                    if (event.candidate) {
+                        this.sendMessage({'ice_send': event.candidate});
+                        console.log('отправляем ICE кандидатов');
+                    } else {
+                        console.log("Sent All Ice " + event.candidate)
+                    }
+                });
+                // this.pc.onnegotiationneeded = async () => {
+                //     try {
+                //         await this.pc.setLocalDescription(await this.pc.createOffer());
+                //         this.sendMessage({'ice_send': this.pc.localDescription});
+                //         // send the offer to the other peer
+                //         // signaling.send({desc: pc.localDescription});
+                //     } catch (err) {
+                //         console.error(err);
+                //     }
+                // };
 
                 // this.pc.onicecandidate = (event =>
                 //     event.candidate?this.sendMessage( JSON.stringify({'ice': event.candidate})):console.log("Sent All Ice") );
+                console.log('перед pc.ontrack ');
                 this.pc.ontrack = (event =>
-                    this.friendsVideo.srcObject = event.stream);
+                    this.friendsVideo.srcObject = event.stream[0]);
+                return;
 
             },
 
@@ -101,28 +121,22 @@
                     console.log('выполняем readSdp(obj)  '+ msg);
                     // var sender = data.val().sender;
                      if (msg.sdp_send.type == "offer"){
+                         console.log('внутри условия msg.sdp_send.type == "offer"');
                          this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send))
                              .then(() => this.pc.createAnswer())
                              .then(answer => this.pc.setLocalDescription(answer))
                              .then(() => this.sendMessage({'sdp_send': this.pc.localDescription}));
-                         this.pc.onicecandidate = (event => {
-                             if (event.candidate) {
-                                 this.sendMessage({'ice_send': event.candidate});
-                                 console.log('отправляем ICE кандидатов');
-                             } else {
-                                 console.log("Sent All Ice " + event.candidate)
-                             }
-                         });
+                         // this.pc.onicecandidate = (event => {
+                         //     if (event.candidate) {
+                         //         this.sendMessage({'ice_send': event.candidate});
+                         //         console.log('отправляем ICE кандидатов');
+                         //     } else {
+                         //         console.log("Sent All Ice " + event.candidate)
+                         //     }
+                         // });
                          } else if (msg.sdp_send.type == "answer"){
+                         console.log('внутри условия msg.sdp_send.type == "answer"');
                          this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send));
-                         this.pc.onicecandidate = (event => {
-                             if (event.candidate) {
-                                 this.sendMessage({'ice_send': event.candidate});
-                                 console.log('отправляем ICE кандидатов');
-                             } else {
-                                 console.log("Sent All Ice " + event.candidate)
-                             }
-                         });
                      }
             },
             readIce() {
@@ -140,7 +154,7 @@
                     navigator.mediaDevices.getUserMedia({audio:true, video:true})
                          .then(stream => this.yourVideo.srcObject = stream)
                          .then(stream => this.pc.addStream(stream));
-
+                    return;
             },
 
             showFriendsFace() {

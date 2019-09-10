@@ -2003,13 +2003,40 @@ __webpack_require__.r(__webpack_exports__);
       }; // console.log(servers);
 
       this.pc = new RTCPeerConnection(servers);
-      this.showMyFace(); // console.log(this.pc);
+      this.showMyFace();
+      console.log('перед pc.onicecandidate');
+
+      this.pc.onicecandidate = function (event) {
+        if (event.candidate) {
+          _this.sendMessage({
+            'ice_send': event.candidate
+          });
+
+          console.log('отправляем ICE кандидатов');
+        } else {
+          console.log("Sent All Ice " + event.candidate);
+        }
+      }; // this.pc.onnegotiationneeded = async () => {
+      //     try {
+      //         await this.pc.setLocalDescription(await this.pc.createOffer());
+      //         this.sendMessage({'ice_send': this.pc.localDescription});
+      //         // send the offer to the other peer
+      //         // signaling.send({desc: pc.localDescription});
+      //     } catch (err) {
+      //         console.error(err);
+      //     }
+      // };
       // this.pc.onicecandidate = (event =>
       //     event.candidate?this.sendMessage( JSON.stringify({'ice': event.candidate})):console.log("Sent All Ice") );
 
+
+      console.log('перед pc.ontrack ');
+
       this.pc.ontrack = function (event) {
-        return _this.friendsVideo.srcObject = event.stream;
+        return _this.friendsVideo.srcObject = event.stream[0];
       };
+
+      return;
     },
     offerVideoChat: function offerVideoChat() {
       console.log('выполняем offerVideoChat()');
@@ -2038,6 +2065,7 @@ __webpack_require__.r(__webpack_exports__);
       console.log('выполняем readSdp(obj)  ' + msg); // var sender = data.val().sender;
 
       if (msg.sdp_send.type == "offer") {
+        console.log('внутри условия msg.sdp_send.type == "offer"');
         this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send)).then(function () {
           return _this2.pc.createAnswer();
         }).then(function (answer) {
@@ -2046,33 +2074,17 @@ __webpack_require__.r(__webpack_exports__);
           return _this2.sendMessage({
             'sdp_send': _this2.pc.localDescription
           });
-        });
-
-        this.pc.onicecandidate = function (event) {
-          if (event.candidate) {
-            _this2.sendMessage({
-              'ice_send': event.candidate
-            });
-
-            console.log('отправляем ICE кандидатов');
-          } else {
-            console.log("Sent All Ice " + event.candidate);
-          }
-        };
+        }); // this.pc.onicecandidate = (event => {
+        //     if (event.candidate) {
+        //         this.sendMessage({'ice_send': event.candidate});
+        //         console.log('отправляем ICE кандидатов');
+        //     } else {
+        //         console.log("Sent All Ice " + event.candidate)
+        //     }
+        // });
       } else if (msg.sdp_send.type == "answer") {
+        console.log('внутри условия msg.sdp_send.type == "answer"');
         this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send));
-
-        this.pc.onicecandidate = function (event) {
-          if (event.candidate) {
-            _this2.sendMessage({
-              'ice_send': event.candidate
-            });
-
-            console.log('отправляем ICE кандидатов');
-          } else {
-            console.log("Sent All Ice " + event.candidate);
-          }
-        };
       }
     },
     readIce: function readIce() {
@@ -2094,6 +2106,7 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (stream) {
         return _this3.pc.addStream(stream);
       });
+      return;
     },
     showFriendsFace: function showFriendsFace() {
       var _this4 = this;
