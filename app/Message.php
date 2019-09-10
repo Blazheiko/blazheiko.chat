@@ -11,13 +11,18 @@ class Message extends Model
      *
      * @var array
      */
-    protected $fillable = ['message','photo_url','is_photo','conversation_id','is_video'];
+    protected $fillable = ['message','photo_url','is_photo','conversation_id','is_video','sdp','ice'];
 
     /**
      * A message belong to a user
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+
+    protected $casts = [
+        'sdp' => 'object',
+        'ice' => 'object',
+    ];
     public function user()
     {
         return $this->belongsTo('App\User');

@@ -41,7 +41,8 @@
                 :conversation="conversation"
                 :contact="contact"
                 :user="user"
-                :msgvideochat="msgvideochat"
+                :ice="ice"
+                :sdp="sdp"
                 :is_video="is_video">
             </video-chat>
 

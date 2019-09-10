@@ -27,7 +27,8 @@ const app = new Vue({
         userto:null,
         conversationid:0,
         unread:0,
-        msgvideochat:null,
+        sdp:null,
+        ice:null,
         is_video:false
     },
 
@@ -66,10 +67,17 @@ const app = new Vue({
                 console.log(message);
                 if (message.conversation_id == this.conversation.id) {
                     if (message.is_video){
-                        if (message.is_video && message.is_photo){
+                        if (message.is_photo){
+                            console.log('пришло is_video');
                             this.is_video=true;
-                        }else {
-                            this.msgVideo = message.message;
+                        }else {if (message.ice){
+                              console.log('пришло ice');
+                              this.ice = message.ice;
+                              }else {
+
+                              this.sdp = message.sdp;
+                            console.log('пришло sdp'+ this.sdp);
+                              }
                         }
                     }else {
                         this.messages.push(message);

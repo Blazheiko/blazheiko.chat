@@ -1943,7 +1943,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "VideoChat",
-  props: ['user', 'contact', 'conversation', 'msgvideochat', 'is_video'],
+  props: ['user', 'contact', 'conversation', 'sdp', 'ice', 'is_video'],
   data: function data() {
     return {
       selected: null,
@@ -1957,11 +1957,17 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {},
   watch: {
-    msgvideochat: function msgvideochat() {
-      this.readMessage();
+    sdp: function sdp() {
+      console.log('event sdp ');
+      this.readSdp();
+    },
+    ice: function ice() {
+      console.log('event ice ');
+      this.readIce();
     },
     is_video: function is_video() {
-      this.startVideoChat();
+      console.log('event is_video ');
+      this.showFriendsFace();
     }
   },
   methods: {
@@ -1998,60 +2004,82 @@ __webpack_require__.r(__webpack_exports__);
 
       this.pc = new RTCPeerConnection(servers);
       this.showMyFace(); // console.log(this.pc);
-
-      this.pc.onicecandidate = function (event) {
-        if (event.candidate) {
-          _this.sendMessage(JSON.stringify({
-            'ice': event.candidate
-          }));
-
-          console.log(JSON.stringify('отправляем ICE кандидатов'));
-        } else {
-          console.log("Sent All Ice " + event.candidate);
-        }
-      }; // this.pc.onicecandidate = (event =>
+      // this.pc.onicecandidate = (event =>
       //     event.candidate?this.sendMessage( JSON.stringify({'ice': event.candidate})):console.log("Sent All Ice") );
-
 
       this.pc.ontrack = function (event) {
         return _this.friendsVideo.srcObject = event.stream;
-      }; // this.showMyFace();
-
-
-      this.showFriendsFace();
+      };
     },
     offerVideoChat: function offerVideoChat() {
       console.log('выполняем offerVideoChat()');
-      axios.get('/offerVideoChat/' + this.conversation.id).then(function (response) {
-        console.log(response.data);
-      });
+      axios.get('/offerVideoChat/' + this.conversation.id); // .then((response) => {
+      //     console.log(response.data);
+      // });
+
       this.startVideoChat();
     },
     sendMessage: function sendMessage(data) {
       // var msg = database.push({ sender: senderId, message: data });
       // msg.remove();
-      axios.post('/videoChat/' + this.conversation.id, data).then(function (response) {
-        console.log('сообщение отправлено');
+      console.log(data);
+      axios.post('/videoChat/' + this.conversation.id, {
+        data: JSON.stringify(data)
+      }).then(function (response) {
+        console.log('response - ' + JSON.stringify(response.data));
       });
-      return;
     },
-    readMessage: function readMessage() {
+    readSdp: function readSdp() {
       var _this2 = this;
 
-      console.log('выполняем readMessage()');
-      var msg = JSON.parse(this.msgVideo); // var sender = data.val().sender;
+      console.log('выполняем readSdp()  ' + this.sdp);
+      if (!this.start) this.startVideoChat();
+      var msg = JSON.parse(this.sdp);
+      console.log('выполняем readSdp(obj)  ' + msg); // var sender = data.val().sender;
 
-      if (this.is_video) {
-        if (msg.ice != undefined) this.pc.addIceCandidate(new RTCIceCandidate(msg.ice));else if (msg.sdp.type == "offer") this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)).then(function () {
+      if (msg.sdp_send.type == "offer") {
+        this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send)).then(function () {
           return _this2.pc.createAnswer();
         }).then(function (answer) {
           return _this2.pc.setLocalDescription(answer);
         }).then(function () {
-          return sendMessage(JSON.stringify({
-            'sdp': _this2.pc.localDescription
-          }));
-        });else if (msg.sdp.type == "answer") this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+          return _this2.sendMessage({
+            'sdp_send': _this2.pc.localDescription
+          });
+        });
+
+        this.pc.onicecandidate = function (event) {
+          if (event.candidate) {
+            _this2.sendMessage({
+              'ice_send': event.candidate
+            });
+
+            console.log('отправляем ICE кандидатов');
+          } else {
+            console.log("Sent All Ice " + event.candidate);
+          }
+        };
+      } else if (msg.sdp_send.type == "answer") {
+        this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send));
+
+        this.pc.onicecandidate = function (event) {
+          if (event.candidate) {
+            _this2.sendMessage({
+              'ice_send': event.candidate
+            });
+
+            console.log('отправляем ICE кандидатов');
+          } else {
+            console.log("Sent All Ice " + event.candidate);
+          }
+        };
       }
+    },
+    readIce: function readIce() {
+      console.log('выполняем readIce()  ' + this.ice);
+      var msg = JSON.parse(this.ice);
+      if (!this.start) this.startVideoChat();
+      if (msg.ice_send != undefined) this.pc.addIceCandidate(new RTCIceCandidate(msg.ice_send));
     },
     // database.on('child_added', readMessage);
     showMyFace: function showMyFace() {
@@ -2066,18 +2094,18 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (stream) {
         return _this3.pc.addStream(stream);
       });
-      return;
     },
     showFriendsFace: function showFriendsFace() {
       var _this4 = this;
 
-      console.log('in showFriendsFace');
+      this.startVideoChat();
+      console.log('выполняем showFriendsFace');
       this.pc.createOffer().then(function (offer) {
         return _this4.pc.setLocalDescription(offer);
       }).then(function () {
-        return _this4.sendMessage(JSON.stringify({
-          'sdp': _this4.pc.localDescription
-        }));
+        return _this4.sendMessage({
+          'sdp_send': _this4.pc.localDescription
+        });
       });
     }
   }
@@ -60879,7 +60907,8 @@ var app = new Vue({
     userto: null,
     conversationid: 0,
     unread: 0,
-    msgvideochat: null,
+    sdp: null,
+    ice: null,
     is_video: false
   },
   created: function created() {
@@ -60919,10 +60948,17 @@ var app = new Vue({
 
         if (message.conversation_id == this.conversation.id) {
           if (message.is_video) {
-            if (message.is_video && message.is_photo) {
+            if (message.is_photo) {
+              console.log('пришло is_video');
               this.is_video = true;
             } else {
-              this.msgVideo = message.message;
+              if (message.ice) {
+                console.log('пришло ice');
+                this.ice = message.ice;
+              } else {
+                this.sdp = message.sdp;
+                console.log('пришло sdp' + this.sdp);
+              }
             }
           } else {
             this.messages.push(message);

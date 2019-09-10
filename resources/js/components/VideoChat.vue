@@ -13,7 +13,7 @@
 <script>
     export default {
         name: "VideoChat",
-        props: ['user','contact','conversation','msgvideochat','is_video'],
+        props: ['user','contact','conversation','sdp','ice','is_video'],
         data() {
             return {
                 selected: null,
@@ -32,11 +32,17 @@
         },
 
         watch: {
-            msgvideochat: function () {
-                this.readMessage() ;
+            sdp: function () {
+                console.log('event sdp ');
+                this.readSdp() ;
+            },
+            ice: function () {
+                console.log('event ice ');
+                this.readIce() ;
             },
             is_video: function () {
-                this.startVideoChat();
+                console.log('event is_video ');
+                this.showFriendsFace();
             },
         },
 
@@ -58,29 +64,20 @@
                 this.pc = new RTCPeerConnection(servers);
                 this.showMyFace();
                 // console.log(this.pc);
-                this.pc.onicecandidate = (event => {
-                    if (event.candidate) {
-                        this.sendMessage(JSON.stringify({'ice': event.candidate}));
-                        console.log(JSON.stringify('отправляем ICE кандидатов'));
-                    } else {
-                        console.log("Sent All Ice " + event.candidate)
-                    }
-                });
+
                 // this.pc.onicecandidate = (event =>
                 //     event.candidate?this.sendMessage( JSON.stringify({'ice': event.candidate})):console.log("Sent All Ice") );
                 this.pc.ontrack = (event =>
                     this.friendsVideo.srcObject = event.stream);
-                // this.showMyFace();
-                this.showFriendsFace();
 
             },
 
             offerVideoChat(){
                 console.log('выполняем offerVideoChat()');
-                axios.get('/offerVideoChat/'+this.conversation.id)
-                    .then((response) => {
-                        console.log(response.data);
-                    });
+                axios.get('/offerVideoChat/'+this.conversation.id);
+                    // .then((response) => {
+                    //     console.log(response.data);
+                    // });
                 this.startVideoChat();
             },
 
@@ -88,48 +85,71 @@
             sendMessage( data) {
                 // var msg = database.push({ sender: senderId, message: data });
                 // msg.remove();
-                    axios.post('/videoChat/'+this.conversation.id,data)
-                        .then((response) => {
-                            console.log('сообщение отправлено');
-                        })
-                    return;
+                console.log(data);
+                axios.post('/videoChat/'+ this.conversation.id, {
+                    data: JSON.stringify(data)
+                }).then((response) => {
+                            console.log('response - '+ JSON.stringify(response.data));
+                        });
+
                  },
 
-                readMessage() {
-                    console.log('выполняем readMessage()');
-                    let msg = JSON.parse(this.msgVideo);
+            readSdp() {
+                    console.log('выполняем readSdp()  '+this.sdp);
+                    if (!this.start)this.startVideoChat();
+                     let msg = JSON.parse(this.sdp);
+                    console.log('выполняем readSdp(obj)  '+ msg);
                     // var sender = data.val().sender;
-                    if (this.is_video) {
-                        if (msg.ice != undefined)
-                            this.pc.addIceCandidate(new RTCIceCandidate(msg.ice));
-                        else if (msg.sdp.type == "offer")
-                            this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp))
-                                .then(() => this.pc.createAnswer())
-                                .then(answer => this.pc.setLocalDescription(answer))
-                                .then(() => sendMessage(JSON.stringify({'sdp': this.pc.localDescription})));
-                        else if (msg.sdp.type == "answer")
-                            this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-                    }
-                },
+                     if (msg.sdp_send.type == "offer"){
+                         this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send))
+                             .then(() => this.pc.createAnswer())
+                             .then(answer => this.pc.setLocalDescription(answer))
+                             .then(() => this.sendMessage({'sdp_send': this.pc.localDescription}));
+                         this.pc.onicecandidate = (event => {
+                             if (event.candidate) {
+                                 this.sendMessage({'ice_send': event.candidate});
+                                 console.log('отправляем ICE кандидатов');
+                             } else {
+                                 console.log("Sent All Ice " + event.candidate)
+                             }
+                         });
+                         } else if (msg.sdp_send.type == "answer"){
+                         this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send));
+                         this.pc.onicecandidate = (event => {
+                             if (event.candidate) {
+                                 this.sendMessage({'ice_send': event.candidate});
+                                 console.log('отправляем ICE кандидатов');
+                             } else {
+                                 console.log("Sent All Ice " + event.candidate)
+                             }
+                         });
+                     }
+            },
+            readIce() {
+                console.log('выполняем readIce()  '+ this.ice);
+                let msg = JSON.parse(this.ice);
+                if (!this.start)this.startVideoChat();
+                if (msg.ice_send != undefined)
+                        this.pc.addIceCandidate(new RTCIceCandidate(msg.ice_send));
+            },
 
                     // database.on('child_added', readMessage);
 
-                showMyFace() {
+            showMyFace() {
                     console.log('in showMyFace');
-
                     navigator.mediaDevices.getUserMedia({audio:true, video:true})
                          .then(stream => this.yourVideo.srcObject = stream)
                          .then(stream => this.pc.addStream(stream));
-                    return;
 
-                },
+            },
 
-                showFriendsFace() {
-                    console.log('in showFriendsFace');
+            showFriendsFace() {
+                    this.startVideoChat();
+                    console.log('выполняем showFriendsFace');
                     this.pc.createOffer()
                         .then(offer => this.pc.setLocalDescription(offer) )
-                        .then(() => this.sendMessage( JSON.stringify({'sdp': this.pc.localDescription})) );
-                }
+                        .then(() => this.sendMessage( {'sdp_send': this.pc.localDescription}) );
+            }
 
         }
     }
