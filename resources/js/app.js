@@ -72,7 +72,7 @@ const app = new Vue({
                             this.is_video=true;
                         }else {if (message.ice){
                               console.log('пришло ice');
-                              this.ice = message.ice;
+                              this.sdp = message.ice;
                               }else {
                               this.sdp = message.sdp;
                               console.log('пришло sdp'+ this.sdp);

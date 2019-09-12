@@ -40,7 +40,7 @@ class VideoChatController extends Controller
 
         broadcast(new MessageSent($user, $messagesNew))->toOthers();
 
-        return response($messagesNew);
+//        return response($messagesNew);
     }
 
     public function offerVideoChat($id)
