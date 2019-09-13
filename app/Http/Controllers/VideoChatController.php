@@ -30,12 +30,8 @@ class VideoChatController extends Controller
         $messagesNew->message = 'webRTC';
         $messagesNew->is_photo = false;
         $messagesNew->is_video = true;
-        if ($request->has('ice_send'))
-        {
-            $messagesNew->ice = $request->get('data');
-        }else{
-            $messagesNew->sdp = $request->get('data');
-        }
+        $messagesNew->sdp = $request->get('data');
+
         $messagesNew -> save();
 
         broadcast(new MessageSent($user, $messagesNew))->toOthers();

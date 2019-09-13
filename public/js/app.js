@@ -1969,10 +1969,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       selected: null,
       yourVideo: null,
       friendsVideo: null,
-      pc: {},
+      pc: null,
       yourId: null,
       senderId: null,
-      start: false
+      start: false,
+      setRemote: false,
+      listICE: []
     };
   },
   mounted: function mounted() {},
@@ -2004,11 +2006,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.start = true;
       this.yourId = this.user.id;
       this.senderId = this.contact.id;
-      this.yourVideo = this.$refs.yourVideo; // for test
-
+      this.yourVideo = this.$refs.yourVideo;
       this.yourVideo.srcObject = null;
-      this.friendsVideo = this.$refs.friendsVideo; // for test
-
+      this.friendsVideo = this.$refs.friendsVideo;
       this.friendsVideo.srcObject = null;
       var servers = {
         'iceServers': [{
@@ -2023,7 +2023,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }; // console.log(servers);
 
       this.pc = new RTCPeerConnection(servers);
-      this.showMyFace();
       console.log('перед pc.onicecandidate');
 
       this.pc.onicecandidate = function (event) {
@@ -2038,109 +2037,120 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       };
 
-      this.pc.onnegotiationneeded =
-      /*#__PURE__*/
-      _asyncToGenerator(
+      console.log('перед pc.ontrack '); // this.pc.ontrack = (event =>
+      //     this.friendsVideo.srcObject = event.stream);
+
+      this.pc.ontrack = function (event) {
+        // don't set srcObject again if it is already set.
+        if (_this.friendsVideo.srcObject) return;
+        _this.friendsVideo.srcObject = event.streams[0];
+        console.log('добавлено friendsVideo.srcObject');
+      };
+    },
+    offerVideoChat: function offerVideoChat() {
+      console.log('выполняем offerVideoChat()');
+      this.startVideoChat();
+      axios.get('/offerVideoChat/' + this.conversation.id);
+    },
+    sendMessage: function sendMessage(data) {
+      console.log(data);
+      axios.post('/videoChat/' + this.conversation.id, {
+        data: JSON.stringify(data)
+      });
+    },
+    readSdp: function () {
+      var _readSdp = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var _this2 = this;
+
+        var msg;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.prev = 0;
-                _context.t0 = _this.pc;
-                _context.next = 4;
-                return _this.pc.createOffer();
+                console.log('выполняем readSdp()  ' + this.sdp);
+                if (!this.start) this.startVideoChat();
+                msg = JSON.parse(this.sdp);
+                console.log('выполняем readSdp(obj)  ' + msg); // var sender = data.val().sender;
 
-              case 4:
-                _context.t1 = _context.sent;
-                _context.next = 7;
-                return _context.t0.setLocalDescription.call(_context.t0, _context.t1);
+                if (!(msg.ice_send != undefined)) {
+                  _context.next = 9;
+                  break;
+                }
 
-              case 7:
-                _this.sendMessage({
-                  'sdp_send': _this.pc.localDescription
-                }); // send the offer to the other peer
-                // signaling.send({desc: pc.localDescription});
+                console.log('внутри  msg.ice_send != undefined  ');
 
+                if (this.setRemote) {
+                  this.listICE.forEach(function (item) {
+                    return _this2.pc.addIceCandidate(item);
+                  });
+                  this.listICE = [];
+                  this.pc.addIceCandidate(msg.ice_send).then(console.log("Кандидат добавлен"));
+                } else {
+                  this.listICE.push(msg.ice_send);
+                }
 
-                _context.next = 13;
+                _context.next = 19;
                 break;
 
-              case 10:
-                _context.prev = 10;
-                _context.t2 = _context["catch"](0);
-                console.error(_context.t2);
+              case 9:
+                if (!(msg.sdp_send.type == "offer")) {
+                  _context.next = 15;
+                  break;
+                }
 
-              case 13:
+                console.log('внутри условия msg.sdp_send.type == "offer"');
+                this.offer = true; // this.pc.setRemoteDescription(msg.sdp_send);
+                // const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:true});
+                // stream.getTracks().forEach((track) => this.pc.addTrack(track, stream));
+                //  this.pc.setLocalDescription( this.pc.createAnswer());
+                // this.sendMessage({'sdp_send': this.pc.localDescription});
+
+                this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send)).then(function () {
+                  return _this2.showMyFace();
+                }).then(function () {
+                  return _this2.pc.createAnswer();
+                }).then(function (answer) {
+                  return _this2.pc.setLocalDescription(answer);
+                }).then(function () {
+                  return _this2.sendMessage({
+                    'sdp_send': _this2.pc.localDescription
+                  });
+                }).then(function () {
+                  return _this2.setRemote = true;
+                });
+                _context.next = 19;
+                break;
+
+              case 15:
+                if (!(msg.sdp_send.type == "answer")) {
+                  _context.next = 19;
+                  break;
+                }
+
+                console.log('внутри условия msg.sdp_send.type == "answer"');
+                _context.next = 19;
+                return this.pc.setRemoteDescription(msg.sdp_send).then(function () {
+                  return _this2.setRemote = true;
+                }).then(function () {
+                  return console.log('выполнили this.pc.setRemoteDescription(msg.sdp_send)');
+                });
+
+              case 19:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, null, [[0, 10]]);
-      })); // this.pc.onicecandidate = (event =>
-      //     event.candidate?this.sendMessage( JSON.stringify({'ice': event.candidate})):console.log("Sent All Ice") );
+        }, _callee, this);
+      }));
 
-      console.log('перед pc.ontrack ');
-
-      this.pc.ontrack = function (event) {
-        return _this.friendsVideo.srcObject = event.stream;
-      };
-
-      return;
-    },
-    offerVideoChat: function offerVideoChat() {
-      console.log('выполняем offerVideoChat()');
-      axios.get('/offerVideoChat/' + this.conversation.id); // .then((response) => {
-      //     console.log(response.data);
-      // });
-
-      this.startVideoChat();
-    },
-    sendMessage: function sendMessage(data) {
-      // var msg = database.push({ sender: senderId, message: data });
-      // msg.remove();
-      console.log(data);
-      axios.post('/videoChat/' + this.conversation.id, {
-        data: JSON.stringify(data)
-      }); // .then((response) => {
-      //         console.log('response - '+ JSON.stringify(response.data));
-      //     });
-    },
-    readSdp: function readSdp() {
-      var _this2 = this;
-
-      console.log('выполняем readSdp()  ' + this.sdp);
-      if (!this.start) this.startVideoChat();
-      var msg = JSON.parse(this.sdp);
-      console.log('выполняем readSdp(obj)  ' + msg); // var sender = data.val().sender;
-
-      if (msg.ice_send != undefined) {
-        console.log('внутри  msg.ice_send != undefined  ');
-        this.pc.addIceCandidate(msg.ice_send);
-      } else {
-        if (msg.sdp_send.type == "offer") {
-          console.log('внутри условия msg.sdp_send.type == "offer"'); // this.pc.setRemoteDescription(msg.sdp_send);
-          // const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:true});
-          // stream.getTracks().forEach((track) => this.pc.addTrack(track, stream));
-          //  this.pc.setLocalDescription( this.pc.createAnswer());
-          // this.sendMessage({'sdp_send': this.pc.localDescription});
-
-          this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send)).then(function () {
-            return _this2.pc.createAnswer();
-          }).then(function (answer) {
-            return _this2.pc.setLocalDescription(answer);
-          }).then(function () {
-            return _this2.sendMessage({
-              'sdp_send': _this2.pc.localDescription
-            });
-          });
-        } else if (msg.sdp_send.type == "answer") {
-          console.log('внутри условия msg.sdp_send.type == "answer"');
-          this.pc.setRemoteDescription(msg.sdp_send); // this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send));
-        }
+      function readSdp() {
+        return _readSdp.apply(this, arguments);
       }
-    },
+
+      return readSdp;
+    }(),
     readIce: function () {
       var _readIce = _asyncToGenerator(
       /*#__PURE__*/
@@ -2176,35 +2186,100 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       return readIce;
     }(),
-    // database.on('child_added', readMessage);
-    showMyFace: function showMyFace() {
-      var _this3 = this;
+    showMyFace: function () {
+      var _showMyFace = _asyncToGenerator(
+      /*#__PURE__*/
+      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
+        var _this3 = this;
 
-      console.log('in showMyFace');
-      navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-      }).then(function (stream) {
-        return _this3.yourVideo.srcObject = stream;
-      }).then(function (stream) {
-        return _this3.pc.addStream(stream);
-      });
-      return; // const stream =  navigator.mediaDevices.getUserMedia({audio:true, video:true});
-      // stream.getTracks().forEach((track) => this.pc.addTrack(track, stream));
-      // this.yourVideo.srcObject = stream;
-    },
+        var stream;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                console.log('in showMyFace');
+                _context3.prev = 1;
+                _context3.next = 4;
+                return navigator.mediaDevices.getUserMedia({
+                  audio: true,
+                  video: true
+                });
+
+              case 4:
+                stream = _context3.sent;
+                stream.getTracks().forEach(function (track) {
+                  return _this3.pc.addTrack(track, stream);
+                });
+                this.yourVideo.srcObject = stream;
+                _context3.next = 12;
+                break;
+
+              case 9:
+                _context3.prev = 9;
+                _context3.t0 = _context3["catch"](1);
+                console.error('ошибка вебкамера....' + _context3.t0);
+
+              case 12:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this, [[1, 9]]);
+      }));
+
+      function showMyFace() {
+        return _showMyFace.apply(this, arguments);
+      }
+
+      return showMyFace;
+    }(),
     showFriendsFace: function showFriendsFace() {
       var _this4 = this;
 
       this.startVideoChat();
       console.log('выполняем showFriendsFace');
-      this.pc.createOffer().then(function (offer) {
-        return _this4.pc.setLocalDescription(offer);
-      }).then(function () {
-        return _this4.sendMessage({
-          'sdp_send': _this4.pc.localDescription
-        });
-      });
+      this.showMyFace();
+      this.pc.onnegotiationneeded =
+      /*#__PURE__*/
+      _asyncToGenerator(
+      /*#__PURE__*/
+      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.prev = 0;
+                _context4.t0 = _this4.pc;
+                _context4.next = 4;
+                return _this4.pc.createOffer();
+
+              case 4:
+                _context4.t1 = _context4.sent;
+
+                _context4.t0.setLocalDescription.call(_context4.t0, _context4.t1);
+
+                _this4.sendMessage({
+                  'sdp_send': _this4.pc.localDescription
+                }); // send the offer to the other peer
+                // signaling.send({desc: pc.localDescription});
+
+
+                _context4.next = 13;
+                break;
+
+              case 9:
+                _context4.prev = 9;
+                _context4.t2 = _context4["catch"](0);
+                console.log('исключение в showFriendsFace()');
+                console.error(_context4.t2);
+
+              case 13:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, null, [[0, 9]]);
+      }));
     }
   }
 });
@@ -61791,8 +61866,7 @@ var app = new Vue({
                 console.log('пришло ice');
                 this.sdp = message.ice;
               } else {
-                this.sdp = message.sdp;
-                console.log('пришло sdp' + this.sdp);
+                this.sdp = message.sdp; // console.log('пришло sdp'+ this.sdp);
               }
             }
           } else {
