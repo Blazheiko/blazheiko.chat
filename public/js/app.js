@@ -2064,7 +2064,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
         var _this2 = this;
 
-        var msg;
+        var msg, stream;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -2074,75 +2074,94 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 msg = JSON.parse(this.sdp);
                 console.log('выполняем readSdp(obj)  ' + msg); // var sender = data.val().sender;
 
-                if (!(msg.ice_send != undefined)) {
-                  _context.next = 9;
+                _context.prev = 4;
+
+                if (!msg.sdp_send) {
+                  _context.next = 31;
                   break;
                 }
 
-                console.log('внутри  msg.ice_send != undefined  ');
-
-                if (this.setRemote) {
-                  this.listICE.forEach(function (item) {
-                    return _this2.pc.addIceCandidate(item);
-                  });
-                  this.listICE = [];
-                  this.pc.addIceCandidate(msg.ice_send).then(console.log("Кандидат добавлен"));
-                } else {
-                  this.listICE.push(msg.ice_send);
+                if (!(msg.sdp_send.type == 'offer')) {
+                  _context.next = 23;
+                  break;
                 }
 
-                _context.next = 19;
-                break;
+                _context.next = 9;
+                return this.pc.setRemoteDescription(msg.sdp_send);
 
               case 9:
-                if (!(msg.sdp_send.type == "offer")) {
-                  _context.next = 15;
-                  break;
-                }
-
-                console.log('внутри условия msg.sdp_send.type == "offer"');
-                this.offer = true; // this.pc.setRemoteDescription(msg.sdp_send);
-                // const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:true});
-                // stream.getTracks().forEach((track) => this.pc.addTrack(track, stream));
-                //  this.pc.setLocalDescription( this.pc.createAnswer());
-                // this.sendMessage({'sdp_send': this.pc.localDescription});
-
-                this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send)).then(function () {
-                  return _this2.showMyFace();
-                }).then(function () {
-                  return _this2.pc.createAnswer();
-                }).then(function (answer) {
-                  return _this2.pc.setLocalDescription(answer);
-                }).then(function () {
-                  return _this2.sendMessage({
-                    'sdp_send': _this2.pc.localDescription
-                  });
-                }).then(function () {
-                  return _this2.setRemote = true;
+                _context.next = 11;
+                return navigator.mediaDevices.getUserMedia({
+                  audio: true,
+                  video: true
                 });
-                _context.next = 19;
+
+              case 11:
+                stream = _context.sent;
+                stream.getTracks().forEach(function (track) {
+                  return _this2.pc.addTrack(track, stream);
+                });
+                this.yourVideo.srcObject = stream;
+                _context.t0 = this.pc;
+                _context.next = 17;
+                return this.pc.createAnswer();
+
+              case 17:
+                _context.t1 = _context.sent;
+                _context.next = 20;
+                return _context.t0.setLocalDescription.call(_context.t0, _context.t1);
+
+              case 20:
+                this.sendMessage({
+                  'sdp_send': this.pc.localDescription
+                });
+                _context.next = 29;
                 break;
 
-              case 15:
-                if (!(msg.sdp_send.type == "answer")) {
-                  _context.next = 19;
+              case 23:
+                if (!(msg.sdp_send.type == 'answer')) {
+                  _context.next = 28;
                   break;
                 }
 
-                console.log('внутри условия msg.sdp_send.type == "answer"');
-                _context.next = 19;
-                return this.pc.setRemoteDescription(msg.sdp_send).then(function () {
-                  return _this2.setRemote = true;
-                }).then(function () {
-                  return console.log('выполнили this.pc.setRemoteDescription(msg.sdp_send)');
-                });
+                _context.next = 26;
+                return this.pc.setRemoteDescription(msg.sdp_send);
 
-              case 19:
+              case 26:
+                _context.next = 29;
+                break;
+
+              case 28:
+                console.log('Unsupported SDP type. Your code may differ here.');
+
+              case 29:
+                _context.next = 34;
+                break;
+
+              case 31:
+                if (!msg.ice_send) {
+                  _context.next = 34;
+                  break;
+                }
+
+                _context.next = 34;
+                return this.pc.addIceCandidate(msg.ice_send);
+
+              case 34:
+                _context.next = 39;
+                break;
+
+              case 36:
+                _context.prev = 36;
+                _context.t2 = _context["catch"](4);
+                console.error('что то пошло не так...' + _context.t2);
+
+              case 39:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this);
+        }, _callee, this, [[4, 36]]);
       }));
 
       function readSdp() {
@@ -2151,80 +2170,53 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       return readSdp;
     }(),
-    readIce: function () {
-      var _readIce = _asyncToGenerator(
+    // async readIce() {
+    //     console.log('выполняем readIce()  ' + this.ice);
+    //     let msg = JSON.parse(this.ice);
+    //     if (!this.start) this.startVideoChat();
+    //     if (msg.ice_send != undefined)
+    //         await this.pc.addIceCandidate(msg.ice_send);
+    //     // this.pc.addIceCandidate(new RTCIceCandidate(msg.ice_send));
+    // },
+    showMyFace: function () {
+      var _showMyFace = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
-        var msg;
+        var _this3 = this;
+
+        var stream;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                console.log('выполняем readIce()  ' + this.ice);
-                msg = JSON.parse(this.ice);
-                if (!this.start) this.startVideoChat();
-
-                if (!(msg.ice_send != undefined)) {
-                  _context2.next = 6;
-                  break;
-                }
-
-                _context2.next = 6;
-                return this.pc.addIceCandidate(msg.ice_send);
-
-              case 6:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function readIce() {
-        return _readIce.apply(this, arguments);
-      }
-
-      return readIce;
-    }(),
-    showMyFace: function () {
-      var _showMyFace = _asyncToGenerator(
-      /*#__PURE__*/
-      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
-        var _this3 = this;
-
-        var stream;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
                 console.log('in showMyFace');
-                _context3.prev = 1;
-                _context3.next = 4;
+                _context2.prev = 1;
+                _context2.next = 4;
                 return navigator.mediaDevices.getUserMedia({
                   audio: true,
                   video: true
                 });
 
               case 4:
-                stream = _context3.sent;
+                stream = _context2.sent;
                 stream.getTracks().forEach(function (track) {
                   return _this3.pc.addTrack(track, stream);
                 });
                 this.yourVideo.srcObject = stream;
-                _context3.next = 12;
+                _context2.next = 12;
                 break;
 
               case 9:
-                _context3.prev = 9;
-                _context3.t0 = _context3["catch"](1);
-                console.error('ошибка вебкамера....' + _context3.t0);
+                _context2.prev = 9;
+                _context2.t0 = _context2["catch"](1);
+                console.error('ошибка вебкамера....' + _context2.t0);
 
               case 12:
               case "end":
-                return _context3.stop();
+                return _context2.stop();
             }
           }
-        }, _callee3, this, [[1, 9]]);
+        }, _callee2, this, [[1, 9]]);
       }));
 
       function showMyFace() {
@@ -2243,20 +2235,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       /*#__PURE__*/
       _asyncToGenerator(
       /*#__PURE__*/
-      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
+      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _context4.prev = 0;
-                _context4.t0 = _this4.pc;
-                _context4.next = 4;
+                _context3.prev = 0;
+                _context3.t0 = _this4.pc;
+                _context3.next = 4;
                 return _this4.pc.createOffer();
 
               case 4:
-                _context4.t1 = _context4.sent;
+                _context3.t1 = _context3.sent;
 
-                _context4.t0.setLocalDescription.call(_context4.t0, _context4.t1);
+                _context3.t0.setLocalDescription.call(_context3.t0, _context3.t1);
 
                 _this4.sendMessage({
                   'sdp_send': _this4.pc.localDescription
@@ -2264,21 +2256,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 // signaling.send({desc: pc.localDescription});
 
 
-                _context4.next = 13;
+                _context3.next = 13;
                 break;
 
               case 9:
-                _context4.prev = 9;
-                _context4.t2 = _context4["catch"](0);
+                _context3.prev = 9;
+                _context3.t2 = _context3["catch"](0);
                 console.log('исключение в showFriendsFace()');
-                console.error(_context4.t2);
+                console.error(_context3.t2);
 
               case 13:
               case "end":
-                return _context4.stop();
+                return _context3.stop();
             }
           }
-        }, _callee4, null, [[0, 9]]);
+        }, _callee3, null, [[0, 9]]);
       }));
     }
   }

@@ -108,52 +108,37 @@
                 let msg = JSON.parse(this.sdp);
                 console.log('выполняем readSdp(obj)  ' + msg);
                 // var sender = data.val().sender;
-                if (msg.ice_send != undefined ){
-                    console.log('внутри  msg.ice_send != undefined  ');
-                    if (this.setRemote){
-                        this.listICE.forEach((item)=>this.pc.addIceCandidate(item));
-                        this.listICE=[];
-                         this.pc.addIceCandidate(msg.ice_send)
-                             .then(
-                                console.log("Кандидат добавлен")
-                            );
-                    } else {
-                        this.listICE.push(msg.ice_send)
+                try {
+                    if (msg.sdp_send) {
+                        // if we get an offer, we need to reply with an answer
+                        if (msg.sdp_send.type == 'offer') {
+                            await this.pc.setRemoteDescription(msg.sdp_send);
+                            const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:true});
+                            stream.getTracks().forEach((track) => this.pc.addTrack(track, stream));
+                            this.yourVideo.srcObject = stream;
+                            await this.pc.setLocalDescription(await this.pc.createAnswer());
+                            this.sendMessage({'sdp_send': this.pc.localDescription});
+                        } else if (msg.sdp_send.type == 'answer') {
+                            await this.pc.setRemoteDescription(msg.sdp_send);
+                        } else {
+                            console.log('Unsupported SDP type. Your code may differ here.');
+                        }
+                    } else if (msg.ice_send) {
+                        await this.pc.addIceCandidate(msg.ice_send);
                     }
-                }
-                else {
-                    if (msg.sdp_send.type == "offer") {
-                        console.log('внутри условия msg.sdp_send.type == "offer"');
-                        this.offer = true;
-                         // this.pc.setRemoteDescription(msg.sdp_send);
-                        // const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:true});
-                        // stream.getTracks().forEach((track) => this.pc.addTrack(track, stream));
-                        //  this.pc.setLocalDescription( this.pc.createAnswer());
-                        // this.sendMessage({'sdp_send': this.pc.localDescription});
-                         this.pc.setRemoteDescription( new RTCSessionDescription(msg.sdp_send))
-                            .then(() => this. showMyFace())
-                            .then(() => this.pc.createAnswer())
-                            .then(answer => this.pc.setLocalDescription(answer))
-                            .then(() => this.sendMessage({'sdp_send': this.pc.localDescription}))
-                             .then(()=>this.setRemote = true);
-                    } else if (msg.sdp_send.type == "answer") {
-                        console.log('внутри условия msg.sdp_send.type == "answer"');
-                        await this.pc.setRemoteDescription(msg.sdp_send)
-                            .then(()=>this.setRemote = true)
-                            .then(() =>console.log('выполнили this.pc.setRemoteDescription(msg.sdp_send)'));
-                        // this.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp_send));
-                    }
+                } catch (err) {
+                    console.error('что то пошло не так...'+err);
                 }
 
             },
-            async readIce() {
-                console.log('выполняем readIce()  ' + this.ice);
-                let msg = JSON.parse(this.ice);
-                if (!this.start) this.startVideoChat();
-                if (msg.ice_send != undefined)
-                    await this.pc.addIceCandidate(msg.ice_send);
-                // this.pc.addIceCandidate(new RTCIceCandidate(msg.ice_send));
-            },
+            // async readIce() {
+            //     console.log('выполняем readIce()  ' + this.ice);
+            //     let msg = JSON.parse(this.ice);
+            //     if (!this.start) this.startVideoChat();
+            //     if (msg.ice_send != undefined)
+            //         await this.pc.addIceCandidate(msg.ice_send);
+            //     // this.pc.addIceCandidate(new RTCIceCandidate(msg.ice_send));
+            // },
 
 
             async showMyFace() {
