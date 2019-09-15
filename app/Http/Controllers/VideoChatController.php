@@ -22,26 +22,33 @@ class VideoChatController extends Controller
      */
     public function message(Request $request,$id)
     {
-
         $user = Auth::user();
-        $messagesNew = new Message();
-        $messagesNew->conversation_id = $id;
-        $messagesNew->user_id = $user->id;
-        $messagesNew->message = 'webRTC';
-        $messagesNew->is_photo = false;
-        $messagesNew->is_video = true;
-        $messagesNew->sdp = $request->get('data');
-
-        $messagesNew -> save();
+        $messagesNew = $user->messages()->create([
+            'conversation_id'=>$id,
+            'message'=>'',
+            'is_photo'=>false,
+            'is_video'=>true,
+            'video_descr' => $request->get('data')
+        ]);
+//        $messagesNew = new Message();
+//        $messagesNew->conversation_id = $id;
+//        $messagesNew->user_id = $user->id;
+//        $messagesNew->message = 'webRTC';
+//        $messagesNew->is_photo = false;
+//        $messagesNew->is_video = true;
+//        $messagesNew->video_descr = $request->get('data');
+//
+//        $messagesNew -> save();
 
         broadcast(new MessageSent($user, $messagesNew))->toOthers();
 
-//        return response($messagesNew);
     }
 
     public function offerVideoChat($id)
     {
         $user = Auth::user();
+//        $user->messages()->where('video_descr', '!=', null)->delete();
+        Message::where('video_descr', '!=', null)->delete();
         $messagesNew = $user->messages()->create([
             'conversation_id'=>$id,'message'=>'Видеочат','photo_url'=>'editor_icon_124382.png','is_photo'=>true, 'is_video'=>true
         ]);

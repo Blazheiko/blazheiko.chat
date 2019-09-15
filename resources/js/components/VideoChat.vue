@@ -44,6 +44,7 @@
             },
             is_video: function () {
                 console.log('event is_video ');
+
                 this.showFriendsFace();
             },
         },
@@ -53,7 +54,10 @@
                 console.log('выполняем startVideoChat');
                 if(this.start){
                     return
-                };
+                }
+                if (!confirm('начать видеочат с - ' + this.contact.name)){
+                    return;
+                }
                 this.start = true;
                 this.yourId = this.user.id;
                 this.senderId = this.contact.id;
@@ -131,14 +135,7 @@
                 }
 
             },
-            // async readIce() {
-            //     console.log('выполняем readIce()  ' + this.ice);
-            //     let msg = JSON.parse(this.ice);
-            //     if (!this.start) this.startVideoChat();
-            //     if (msg.ice_send != undefined)
-            //         await this.pc.addIceCandidate(msg.ice_send);
-            //     // this.pc.addIceCandidate(new RTCIceCandidate(msg.ice_send));
-            // },
+
 
 
             async showMyFace() {

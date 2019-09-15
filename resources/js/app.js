@@ -50,7 +50,7 @@ const app = new Vue({
     methods: {
         //Запрашиваем у сервера все сообщения по данному контакту
         fetchMessages(contact) {
-            axios.get('/messages/'+this.contact.id).then(response => {
+            axios.get('/messages/'+contact.id).then(response => {
                 console.log(response.data);
                 this.messages=[];
                 this.messages = response.data.messages;
@@ -65,25 +65,19 @@ const app = new Vue({
         handleIncoming(message,userFrom) {
             if (this.contact){
                 console.log(message);
-                if (message.conversation_id == this.conversation.id) {
-                    if (message.is_video){
-                        if (message.is_photo){
-                            console.log('пришло is_video');
-                            this.is_video=true;
-                        }else {if (message.ice){
-                              console.log('пришло ice');
-                              this.sdp = message.ice;
-                              }else {
-                              this.sdp = message.sdp;
-                              // console.log('пришло sdp'+ this.sdp);
-                              }
-                        }
+                if (message.is_video){
+                    if (message.is_photo){
+                        console.log('пришло is_video');
+                        this.selectedContact(userFrom);
+                        this.is_video=true;
                     }else {
-                        this.messages.push(message);
-                        this.incrementCounter(userFrom.id);
-                        return;
+                        this.sdp = message.video_descr;
+                         console.log('пришло video_descr'+ message.video_descr);
                     }
-
+                }
+                if (message.conversation_id == this.conversation.id) {
+                    this.messages.push(message);
+                    this.incrementCounter(userFrom.id);
                 }
                 else {
                     for (i=0;i < this.contacts.length;i++) {
@@ -131,7 +125,7 @@ const app = new Vue({
 
         selectedContact(contact){
             this.contact=contact;
-            this.fetchMessages();
+            this.fetchMessages(contact);
         },
 
         // отправляем сообщение на сервер

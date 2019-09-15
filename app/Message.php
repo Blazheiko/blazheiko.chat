@@ -11,7 +11,7 @@ class Message extends Model
      *
      * @var array
      */
-    protected $fillable = ['message','photo_url','is_photo','conversation_id','is_video','sdp','ice'];
+    protected $fillable = ['message','photo_url','is_photo','conversation_id','is_video','video_descr'];
 
     /**
      * A message belong to a user
@@ -20,8 +20,7 @@ class Message extends Model
      */
 
     protected $casts = [
-        'sdp' => 'object',
-        'ice' => 'object',
+        'video_descr' => 'object',
     ];
     public function user()
     {

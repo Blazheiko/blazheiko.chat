@@ -2002,7 +2002,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return;
       }
 
-      ;
+      if (!confirm('начать видеочат с - ' + this.contact.name)) {
+        return;
+      }
+
       this.start = true;
       this.yourId = this.user.id;
       this.senderId = this.contact.id;
@@ -2170,14 +2173,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       return readSdp;
     }(),
-    // async readIce() {
-    //     console.log('выполняем readIce()  ' + this.ice);
-    //     let msg = JSON.parse(this.ice);
-    //     if (!this.start) this.startVideoChat();
-    //     if (msg.ice_send != undefined)
-    //         await this.pc.addIceCandidate(msg.ice_send);
-    //     // this.pc.addIceCandidate(new RTCIceCandidate(msg.ice_send));
-    // },
     showMyFace: function () {
       var _showMyFace = _asyncToGenerator(
       /*#__PURE__*/
@@ -61832,7 +61827,7 @@ var app = new Vue({
     fetchMessages: function fetchMessages(contact) {
       var _this2 = this;
 
-      axios.get('/messages/' + this.contact.id).then(function (response) {
+      axios.get('/messages/' + contact.id).then(function (response) {
         console.log(response.data);
         _this2.messages = [];
         _this2.messages = response.data.messages;
@@ -61848,24 +61843,20 @@ var app = new Vue({
       if (this.contact) {
         console.log(message);
 
-        if (message.conversation_id == this.conversation.id) {
-          if (message.is_video) {
-            if (message.is_photo) {
-              console.log('пришло is_video');
-              this.is_video = true;
-            } else {
-              if (message.ice) {
-                console.log('пришло ice');
-                this.sdp = message.ice;
-              } else {
-                this.sdp = message.sdp; // console.log('пришло sdp'+ this.sdp);
-              }
-            }
+        if (message.is_video) {
+          if (message.is_photo) {
+            console.log('пришло is_video');
+            this.selectedContact(userFrom);
+            this.is_video = true;
           } else {
-            this.messages.push(message);
-            this.incrementCounter(userFrom.id);
-            return;
+            this.sdp = message.video_descr;
+            console.log('пришло video_descr' + message.video_descr);
           }
+        }
+
+        if (message.conversation_id == this.conversation.id) {
+          this.messages.push(message);
+          this.incrementCounter(userFrom.id);
         } else {
           for (i = 0; i < this.contacts.length; i++) {
             if (this.contacts[i].contact.id == userFrom.id) {
@@ -61911,7 +61902,7 @@ var app = new Vue({
     },
     selectedContact: function selectedContact(contact) {
       this.contact = contact;
-      this.fetchMessages();
+      this.fetchMessages(contact);
     },
     // отправляем сообщение на сервер
     sendMessage: function sendMessage(text) {
