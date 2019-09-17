@@ -44,10 +44,6 @@
                 console.log('event sdp ');
                 this.readSdp() ;
             },
-            // ice: function () {
-            //     console.log('event ice ');
-            //     this.readIce() ;
-            // },
             is_video: function () {
                 console.log('event is_video ');
 

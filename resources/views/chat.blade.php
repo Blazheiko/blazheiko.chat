@@ -34,7 +34,8 @@
                 <div class="list-group">
                     <chat-list
                         v-on:selected="selectedContact"
-                        :contacts="contacts"></chat-list>
+                        :contacts="contacts"
+                        :selected_video="selected_video"></chat-list>
                 </div>
             </div>
             <video-chat

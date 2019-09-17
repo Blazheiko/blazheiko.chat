@@ -1797,6 +1797,10 @@ __webpack_require__.r(__webpack_exports__);
     contacts: {
       type: Array,
       "default": []
+    },
+    selected_video: {
+      type: Object,
+      "default": null
     }
   },
   data: function data() {
@@ -1804,10 +1808,15 @@ __webpack_require__.r(__webpack_exports__);
       selected: null
     };
   },
-  mounted: function mounted() {},
   updated: function updated() {
     if (this.selected == null && this.contacts.length) {
       this.selectContact(this.contacts[0].contact);
+    }
+  },
+  watch: {
+    selected_video: function selected_video() {
+      console.log('event selected_video ');
+      this.selectContact(this.selected_video);
     }
   },
   methods: {
@@ -1972,10 +1981,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log('event sdp ');
       this.readSdp();
     },
-    // ice: function () {
-    //     console.log('event ice ');
-    //     this.readIce() ;
-    // },
     is_video: function is_video() {
       console.log('event is_video ');
       this.showFriendsFace();
@@ -49418,9 +49423,9 @@ var render = function() {
         { staticClass: "chat" },
         _vm._l(_vm.messages, function(message) {
           return _c("li", { staticClass: "left clearfix" }, [
-            _c("div", { staticClass: "chat-body clearfix" }, [
-              message.message != ""
-                ? _c("div", { staticClass: "header" }, [
+            message.message != ""
+              ? _c("div", { staticClass: "chat-body clearfix" }, [
+                  _c("div", { staticClass: "header" }, [
                     message.user_id === _vm.user.id
                       ? _c("div", { staticClass: "received" }, [
                           _c("strong", { staticClass: "primary-font" }, [
@@ -49452,7 +49457,7 @@ var render = function() {
                           _c("div", { staticClass: "date" }, [
                             _vm._v(
                               "\n                        " +
-                                _vm._s(message.datatime) +
+                                _vm._s(message.created_at) +
                                 "\n                    "
                             )
                           ]),
@@ -49515,7 +49520,7 @@ var render = function() {
                           _c("div", { staticClass: "date" }, [
                             _vm._v(
                               "\n                        " +
-                                _vm._s(message.datatime) +
+                                _vm._s(message.created_at) +
                                 "\n                    "
                             )
                           ]),
@@ -49549,8 +49554,8 @@ var render = function() {
                             : _vm._e()
                         ])
                   ])
-                : _vm._e()
-            ])
+                ])
+              : _vm._e()
           ])
         }),
         0
@@ -61842,6 +61847,7 @@ var app = new Vue({
     conversation: null,
     user: null,
     userto: null,
+    selected_video: null,
     index: 0,
     // conversationid:0,
     unread: 0,
@@ -61894,6 +61900,7 @@ var app = new Vue({
             console.log('пришло video_descr' + message.video_descr);
           } else {
             this.messages.push(message);
+            this.contacts[this.index].count_read++;
           }
         }
       }
@@ -61923,16 +61930,13 @@ var app = new Vue({
     },
     // выравниваем колличество прочитанных и непрочитанных
     resetUnread: function resetUnread() {
-      // for (i=0;i < this.contacts.length;i++){
-      //     if (this.contacts[i].contact.id == this.contact.id){
       this.contacts[this.index].count_read = this.conversation.counter;
-      this.contacts[this.index].counter = this.conversation.counter; //         return
-      //     }
-      // }
+      this.contacts[this.index].counter = this.conversation.counter;
     },
     startVideoChat: function startVideoChat(contact) {
-      this.selectedContact(contact);
-      this.video_is = true;
+      // this.selectedContact(contact);
+      this.selected_video = contact;
+      this.is_video = true;
     },
     // запрашиваем у сервера список контактов
     fetchContacts: function fetchContacts() {
@@ -61946,7 +61950,7 @@ var app = new Vue({
     selectedContact: function selectedContact(contact) {
       this.contact = contact;
 
-      for (var _i; _i < this.contacts.length; _i++) {
+      for (var _i = 0; _i < this.contacts.length; _i++) {
         if (this.contacts[_i].contact.id == contact.id) {
           this.index = _i;
           break;
@@ -61971,8 +61975,9 @@ var app = new Vue({
 
         _this4.messages.push(response.data.message);
 
-        _this4.incrementCounter(_this4.contact.id); // console.log(response.data);
-
+        _this4.contacts[_this4.index].count_read++;
+        _this4.contacts[_this4.index].counter++; // this.incrementCounter(this.conversation.id);
+        // console.log(response.data);
       });
     },
     //отправляем файлы на сервер
@@ -61988,7 +61993,7 @@ var app = new Vue({
       axios.post('/photo/' + this.conversation.id, photoname).then(function (response) {
         _this5.messages.push(response.data.message);
 
-        _this5.incrementCounter(_this5.contact.id);
+        _this5.incrementCounter(_this5.conversation.id);
 
         console.log(response.data);
       });

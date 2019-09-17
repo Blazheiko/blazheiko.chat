@@ -25,6 +25,7 @@ const app = new Vue({
         conversation:null,
         user:null,
         userto:null,
+        selected_video:null,
         index:0,
         // conversationid:0,
         unread:0,
@@ -57,7 +58,7 @@ const app = new Vue({
                 this.user = response.data.user;
                 this.userto = response.data.userto;
                 this.conversation=response.data.conversation;
-                this.resetUnread();
+                this.resetUnread( );
             });
         },
 
@@ -77,6 +78,7 @@ const app = new Vue({
                         console.log('пришло video_descr'+ message.video_descr);
                     }else {
                         this.messages.push(message);
+                        this.contacts[this.index].count_read ++;
                     }
                 }
             }
@@ -104,17 +106,13 @@ const app = new Vue({
         },
         // выравниваем колличество прочитанных и непрочитанных
         resetUnread(){
-            // for (i=0;i < this.contacts.length;i++){
-            //     if (this.contacts[i].contact.id == this.contact.id){
-                    this.contacts[this.index].count_read =this.conversation.counter;
-                    this.contacts[this.index].counter =this.conversation.counter;
-            //         return
-            //     }
-            // }
+            this.contacts[this.index].count_read = this.conversation.counter;
+            this.contacts[this.index].counter = this.conversation.counter;
         },
         startVideoChat(contact){
-            this.selectedContact(contact);
-            this.video_is = true;
+            // this.selectedContact(contact);
+            this.selected_video = contact;
+            this.is_video=true;
 
         },
         // запрашиваем у сервера список контактов
@@ -127,7 +125,7 @@ const app = new Vue({
 
         selectedContact(contact){
             this.contact= contact;
-            for (let i; i<this.contacts.length ; i++){
+            for (let i=0; i<this.contacts.length ; i++){
                 if (this.contacts[i].contact.id == contact.id) {
                     this.index = i ;
                     break}
@@ -136,7 +134,7 @@ const app = new Vue({
         },
 
         // отправляем сообщение на сервер
-        sendMessage(text) {
+        sendMessage: function (text) {
             if (!this.contact) {
                 return;
             }
@@ -146,7 +144,9 @@ const app = new Vue({
             }).then((response) => {
                 console.log(response.data);
                 this.messages.push(response.data.message);
-                this.incrementCounter(this.contact.id);
+                this.contacts[this.index].count_read++;
+                this.contacts[this.index].counter++;
+                // this.incrementCounter(this.conversation.id);
                 // console.log(response.data);
             })
         },
@@ -161,7 +161,7 @@ const app = new Vue({
             axios.post('/photo/'+this.conversation.id,photoname)
                 .then((response) => {
                     this.messages.push(response.data.message);
-                    this.incrementCounter(this.contact.id);
+                    this.incrementCounter(this.conversation.id);
                     console.log(response.data);
                 })
         },

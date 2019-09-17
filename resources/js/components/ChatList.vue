@@ -25,20 +25,28 @@
                 type: Array,
                  default: []
             },
+            selected_video:{
+                type: Object,
+                default:null
+            }
         },
         data() {
             return {
                 selected:null
             };
         },
-        mounted: function () {
-
-        },
 
         updated(){
             if (this.selected == null && this.contacts.length){
                 this.selectContact(this.contacts[0].contact)
             }
+        },
+        watch: {
+            selected_video: function () {
+                console.log('event selected_video ');
+                this.selectContact(this.selected_video) ;
+            },
+
         },
 
         methods: {

@@ -3,8 +3,8 @@
 
         <ul class="chat" v-if="messages">
             <li class="left clearfix" v-for="message in messages">
-                <div   class="chat-body clearfix">
-                    <div class="header" v-if="message.message != '' ">
+                <div   class="chat-body clearfix" v-if="message.message != '' ">
+                    <div class="header">
                         <div class="received" v-if="message.user_id === user.id">
                             <strong class="primary-font">
                                 <img v-bind:src="'/uploads/avatars/'+ user.avatar" style="width:32px; height:32px; border-radius:50%">
@@ -14,7 +14,7 @@
                                 {{ message.message }}
                             </div>
                             <div class="date">
-                                {{ message.datatime }}
+                                {{ message.created_at }}
                             </div>
 
 
@@ -36,7 +36,7 @@
                                 {{ message.message }}
                             </div>
                             <div class="date">
-                                {{ message.datatime }}
+                                {{ message.created_at }}
                             </div>
                             <span v-if="message.is_photo">
                                 <div class="modal-header">
