@@ -30,15 +30,6 @@ class VideoChatController extends Controller
             'is_video'=>true,
             'video_descr' => $request->get('data')
         ]);
-//        $messagesNew = new Message();
-//        $messagesNew->conversation_id = $id;
-//        $messagesNew->user_id = $user->id;
-//        $messagesNew->message = 'webRTC';
-//        $messagesNew->is_photo = false;
-//        $messagesNew->is_video = true;
-//        $messagesNew->video_descr = $request->get('data');
-//
-//        $messagesNew -> save();
 
         broadcast(new MessageSent($user, $messagesNew))->toOthers();
 

@@ -32,14 +32,7 @@
             };
         },
         mounted: function () {
-            // this.$nextTick(function () {
-            //     // Код, который будет запущен только после
-            //     // отображения всех представлений
-            //     // console.log('в mounted');
-            //     // if (this.contacts.length){
-            //     //     this.selected = this.contacts[0].contact
-            //     //         };
-            // })
+
         },
 
         updated(){
@@ -55,16 +48,7 @@
                 this.$emit('selected', contact);
             }
         },
-        computed: {
-            // sortedContacts() {
-            //     return _.sortBy(this.contacts, [(contact) => {
-            //         if (contact == this.selected) {
-            //             return Infinity;
-            //         }
-            //         return contact.unread;
-            //     }]).reverse();
-            // }
-        }
+
     }
 </script>
 

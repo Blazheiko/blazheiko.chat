@@ -1804,15 +1804,7 @@ __webpack_require__.r(__webpack_exports__);
       selected: null
     };
   },
-  mounted: function mounted() {// this.$nextTick(function () {
-    //     // Код, который будет запущен только после
-    //     // отображения всех представлений
-    //     // console.log('в mounted');
-    //     // if (this.contacts.length){
-    //     //     this.selected = this.contacts[0].contact
-    //     //         };
-    // })
-  },
+  mounted: function mounted() {},
   updated: function updated() {
     if (this.selected == null && this.contacts.length) {
       this.selectContact(this.contacts[0].contact);
@@ -1823,15 +1815,6 @@ __webpack_require__.r(__webpack_exports__);
       this.selected = contact;
       this.$emit('selected', contact);
     }
-  },
-  computed: {// sortedContacts() {
-    //     return _.sortBy(this.contacts, [(contact) => {
-    //         if (contact == this.selected) {
-    //             return Infinity;
-    //         }
-    //         return contact.unread;
-    //     }]).reverse();
-    // }
   }
 });
 
@@ -1961,19 +1944,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "VideoChat",
-  props: ['user', 'contact', 'conversation', 'sdp', 'ice', 'is_video'],
+  props: ['user', 'contact', 'conversation', 'sdp', 'is_video'],
   data: function data() {
     return {
-      selected: null,
+      // selected: null,
       yourVideo: null,
       friendsVideo: null,
       pc: null,
       yourId: null,
       senderId: null,
       start: false,
-      setRemote: false,
+      // setRemote:false,
       listICE: []
     };
   },
@@ -1983,10 +1972,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log('event sdp ');
       this.readSdp();
     },
-    ice: function ice() {
-      console.log('event ice ');
-      this.readIce();
-    },
+    // ice: function () {
+    //     console.log('event ice ');
+    //     this.readIce() ;
+    // },
     is_video: function is_video() {
       console.log('event is_video ');
       this.showFriendsFace();
@@ -2017,11 +2006,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         'iceServers': [{
           'urls': 'stun:stun.l.google.com:19302'
         }, {
-          'urls': 'stun:stun.services.mozilla.com'
-        }, {
-          'urls': 'turn:numb.viagenie.ca',
-          'credential': 'webrtc',
-          'username': 'websitebeaver@mail.com'
+          url: 'turn:turn.anyfirewall.com:443?transport=tcp',
+          credential: 'webrtc',
+          username: 'webrtc'
         }]
       }; // console.log(servers);
 
@@ -2037,6 +2024,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           console.log('отправляем ICE кандидатов');
         } else {
           console.log("Sent All Ice " + event.candidate);
+
+          _this.listICE.forEach(function (item) {
+            return _this.pc.addIceCandidate(item);
+          });
+
+          _this.listICE = [];
         }
       };
 
@@ -2151,15 +2144,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return this.pc.addIceCandidate(msg.ice_send);
 
               case 34:
-                _context.next = 39;
+                _context.next = 41;
                 break;
 
               case 36:
                 _context.prev = 36;
                 _context.t2 = _context["catch"](4);
                 console.error('что то пошло не так...' + _context.t2);
+                console.error(msg.ice_send);
+                this.listICE.push(msg.ice_send);
 
-              case 39:
+              case 41:
               case "end":
                 return _context.stop();
             }
@@ -2267,6 +2262,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee3, null, [[0, 9]]);
       }));
+    },
+    endVideoChat: function endVideoChat() {
+      this.pc.close();
+      this.start = false;
+      this.yourVideo.srcObject.getTracks().forEach(function (track) {
+        return track.stop();
+      });
+      alert('Видеочат с - ' + this.contact.name + '  завершен.');
+      this.pc = null;
+      this.yourVideo.srcObject = null;
+      this.friendsVideo.srcObject = null;
     }
   }
 });
@@ -49413,127 +49419,137 @@ var render = function() {
         _vm._l(_vm.messages, function(message) {
           return _c("li", { staticClass: "left clearfix" }, [
             _c("div", { staticClass: "chat-body clearfix" }, [
-              _c("div", { staticClass: "header" }, [
-                message.user_id === _vm.user.id
-                  ? _c("div", { staticClass: "received" }, [
-                      _c("strong", { staticClass: "primary-font" }, [
-                        _c("img", {
-                          staticStyle: {
-                            width: "32px",
-                            height: "32px",
-                            "border-radius": "50%"
-                          },
-                          attrs: { src: "/uploads/avatars/" + _vm.user.avatar }
-                        }),
-                        _vm._v(
-                          "\n                        " +
-                            _vm._s(_vm.user.name) +
-                            "\n                    "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "text" }, [
-                        _vm._v(
-                          "\n                        " +
-                            _vm._s(message.message) +
-                            "\n                    "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "date" }, [
-                        _vm._v(
-                          "\n                        " +
-                            _vm._s(message.datatime) +
-                            "\n                    "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      message.is_photo
-                        ? _c("span", [
-                            _c("div", { staticClass: "modal-header" }, [
-                              _c(
-                                "div",
-                                { staticClass: "col-md-10 col-md-offset-1" },
-                                [
-                                  _c("img", {
-                                    staticStyle: {
-                                      width: "150px",
-                                      height: "150px",
-                                      float: "left",
-                                      "margin-right": "25px"
+              message.message != ""
+                ? _c("div", { staticClass: "header" }, [
+                    message.user_id === _vm.user.id
+                      ? _c("div", { staticClass: "received" }, [
+                          _c("strong", { staticClass: "primary-font" }, [
+                            _c("img", {
+                              staticStyle: {
+                                width: "32px",
+                                height: "32px",
+                                "border-radius": "50%"
+                              },
+                              attrs: {
+                                src: "/uploads/avatars/" + _vm.user.avatar
+                              }
+                            }),
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(_vm.user.name) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "text" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.message) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "date" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.datatime) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          message.is_photo
+                            ? _c("span", [
+                                _c("div", { staticClass: "modal-header" }, [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "col-md-10 col-md-offset-1"
                                     },
-                                    attrs: {
-                                      src:
-                                        "/uploads/photos/" + message.photo_url
-                                    }
-                                  })
-                                ]
-                              )
-                            ])
-                          ])
-                        : _vm._e()
-                    ])
-                  : _c("div", { staticClass: "sent" }, [
-                      _c("strong", { staticClass: "primary-font" }, [
-                        _c("img", {
-                          staticStyle: {
-                            width: "32px",
-                            height: "32px",
-                            "border-radius": "50%"
-                          },
-                          attrs: {
-                            src: "/uploads/avatars/" + _vm.userto.avatar
-                          }
-                        }),
-                        _vm._v(
-                          "\n                            " +
-                            _vm._s(_vm.userto.name) +
-                            "\n                        "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "text" }, [
-                        _vm._v(
-                          "\n                        " +
-                            _vm._s(message.message) +
-                            "\n                    "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "date" }, [
-                        _vm._v(
-                          "\n                        " +
-                            _vm._s(message.datatime) +
-                            "\n                    "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      message.is_photo
-                        ? _c("span", [
-                            _c("div", { staticClass: "modal-header" }, [
-                              _c(
-                                "div",
-                                { staticClass: "col-md-10 col-md-offset-1" },
-                                [
-                                  _c("img", {
-                                    staticStyle: {
-                                      width: "150px",
-                                      height: "150px",
-                                      float: "left",
-                                      "margin-right": "25px"
+                                    [
+                                      _c("img", {
+                                        staticStyle: {
+                                          width: "150px",
+                                          height: "150px",
+                                          float: "left",
+                                          "margin-right": "25px"
+                                        },
+                                        attrs: {
+                                          src:
+                                            "/uploads/photos/" +
+                                            message.photo_url
+                                        }
+                                      })
+                                    ]
+                                  )
+                                ])
+                              ])
+                            : _vm._e()
+                        ])
+                      : _c("div", { staticClass: "sent" }, [
+                          _c("strong", { staticClass: "primary-font" }, [
+                            _c("img", {
+                              staticStyle: {
+                                width: "32px",
+                                height: "32px",
+                                "border-radius": "50%"
+                              },
+                              attrs: {
+                                src: "/uploads/avatars/" + _vm.userto.avatar
+                              }
+                            }),
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(_vm.userto.name) +
+                                "\n                        "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "text" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.message) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "date" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.datatime) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          message.is_photo
+                            ? _c("span", [
+                                _c("div", { staticClass: "modal-header" }, [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "col-md-10 col-md-offset-1"
                                     },
-                                    attrs: {
-                                      src:
-                                        "/uploads/photos/" + message.photo_url
-                                    }
-                                  })
-                                ]
-                              )
-                            ])
-                          ])
-                        : _vm._e()
-                    ])
-              ])
+                                    [
+                                      _c("img", {
+                                        staticStyle: {
+                                          width: "150px",
+                                          height: "150px",
+                                          float: "left",
+                                          "margin-right": "25px"
+                                        },
+                                        attrs: {
+                                          src:
+                                            "/uploads/photos/" +
+                                            message.photo_url
+                                        }
+                                      })
+                                    ]
+                                  )
+                                ])
+                              ])
+                            : _vm._e()
+                        ])
+                  ])
+                : _vm._e()
             ])
           ])
         }),
@@ -49607,25 +49623,49 @@ var render = function() {
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _c(
-      "button",
-      {
-        staticClass: "btn btn-danger btn-lg",
-        attrs: { type: "button" },
-        on: {
-          click: function($event) {
-            return _vm.offerVideoChat()
-          }
-        }
-      },
-      [
-        _c("span", {
-          staticClass: "glyphicon glyphicon-facetime-video",
-          attrs: { "aria-hidden": "true" }
-        }),
-        _vm._v(" Call")
-      ]
-    )
+    _vm.start
+      ? _c("div", [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-danger btn-lg",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  return _vm.endVideoChat()
+                }
+              }
+            },
+            [
+              _c("span", {
+                staticClass: "glyphicon glyphicon-facetime-video",
+                attrs: { "aria-hidden": "true" }
+              }),
+              _vm._v(" Закончить видеочат ")
+            ]
+          )
+        ])
+      : _c("div", [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-success btn-lg",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  return _vm.offerVideoChat()
+                }
+              }
+            },
+            [
+              _c("span", {
+                staticClass: "glyphicon glyphicon-facetime-video",
+                attrs: { "aria-hidden": "true" }
+              }),
+              _vm._v(" Видеочат ")
+            ]
+          )
+        ])
   ])
 }
 var staticRenderFns = []
@@ -61802,10 +61842,10 @@ var app = new Vue({
     conversation: null,
     user: null,
     userto: null,
-    conversationid: 0,
+    index: 0,
+    // conversationid:0,
     unread: 0,
     sdp: null,
-    ice: null,
     is_video: false
   },
   created: function created() {
@@ -61843,53 +61883,56 @@ var app = new Vue({
       if (this.contact) {
         console.log(message);
 
-        if (message.is_video) {
-          if (message.is_photo) {
-            console.log('пришло is_video');
-            this.selectedContact(userFrom);
-            this.is_video = true;
-          } else {
-            this.sdp = message.video_descr;
-            console.log('пришло video_descr' + message.video_descr);
-          }
+        if (message.is_video && message.is_photo && this.isOnContacts(message.conversation_id)) {
+          console.log('пришло is_video');
+          this.startVideoChat(userFrom);
         }
 
         if (message.conversation_id == this.conversation.id) {
-          this.messages.push(message);
-          this.incrementCounter(userFrom.id);
-        } else {
-          for (i = 0; i < this.contacts.length; i++) {
-            if (this.contacts[i].contact.id == userFrom.id) {
-              // this.contacts[i].unread++;
-              this.contacts[i].counter++; // this.sendUnread(this.contacts[i].unread,message.conversation_id);
-
-              return;
-            }
+          if (message.is_video) {
+            this.sdp = message.video_descr;
+            console.log('пришло video_descr' + message.video_descr);
+          } else {
+            this.messages.push(message);
           }
         }
       }
+
+      this.incrementCounter(message.conversation_id);
     },
-    incrementCounter: function incrementCounter(idUserFrom) {
+    isOnContacts: function isOnContacts(conversationId) {
+      var flag = false;
+
       for (i = 0; i < this.contacts.length; i++) {
-        if (this.contacts[i].contact.id == idUserFrom) {
-          this.contacts[i].counter++;
-          this.contacts[i].count_read++;
-          return;
+        if (this.contacts[i].conversation_id == conversationId) {
+          flag = true;
+          break;
+        }
+      }
+
+      return flag;
+    },
+    incrementCounter: function incrementCounter(conversationId) {
+      for (i = 0; i < this.contacts.length; i++) {
+        if (this.contacts[i].conversation_id == conversationId) {
+          this.contacts[i].counter++; // this.contacts[i].count_read ++;
+
+          break;
         }
       }
     },
     // выравниваем колличество прочитанных и непрочитанных
     resetUnread: function resetUnread() {
-      for (i = 0; i < this.contacts.length; i++) {
-        if (this.contacts[i].contact.id == this.contact.id) {
-          this.contacts[i].count_read = this.conversation.counter;
-          this.contacts[i].counter = this.conversation.counter;
-          return;
-        }
-      }
+      // for (i=0;i < this.contacts.length;i++){
+      //     if (this.contacts[i].contact.id == this.contact.id){
+      this.contacts[this.index].count_read = this.conversation.counter;
+      this.contacts[this.index].counter = this.conversation.counter; //         return
+      //     }
+      // }
     },
-    startVideoChat: function startVideoChat() {
-      video_is = true;
+    startVideoChat: function startVideoChat(contact) {
+      this.selectedContact(contact);
+      this.video_is = true;
     },
     // запрашиваем у сервера список контактов
     fetchContacts: function fetchContacts() {
@@ -61902,6 +61945,14 @@ var app = new Vue({
     },
     selectedContact: function selectedContact(contact) {
       this.contact = contact;
+
+      for (var _i; _i < this.contacts.length; _i++) {
+        if (this.contacts[_i].contact.id == contact.id) {
+          this.index = _i;
+          break;
+        }
+      }
+
       this.fetchMessages(contact);
     },
     // отправляем сообщение на сервер

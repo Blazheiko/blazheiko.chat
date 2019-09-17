@@ -4,8 +4,14 @@
         <video id="yourVideo" ref="yourVideo"  autoplay muted></video>
         <video id="friendsVideo" ref="friendsVideo" autoplay></video>
         <br />
-        <button @click="offerVideoChat()" type="button" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span> Call</button>
-    </div>
+        <div v-if="start">
+            <button @click="endVideoChat()" type="button" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true" ></span> Закончить видеочат </button>
+        </div>
+        <div v-else >
+        <button @click="offerVideoChat()" type="button" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true" ></span> Видеочат </button>
+        </div>
+
+        </div>
 
 
 </template>
@@ -13,17 +19,17 @@
 <script>
     export default {
         name: "VideoChat",
-        props: ['user','contact','conversation','sdp','ice','is_video'],
+        props: ['user','contact','conversation','sdp','is_video'],
         data() {
             return {
-                selected: null,
+                // selected: null,
                 yourVideo:null,
                 friendsVideo:null,
                 pc:null,
                 yourId:null,
                 senderId:null,
                 start:false,
-                setRemote:false,
+                // setRemote:false,
                 listICE:[]
             };
         },
@@ -38,10 +44,10 @@
                 console.log('event sdp ');
                 this.readSdp() ;
             },
-            ice: function () {
-                console.log('event ice ');
-                this.readIce() ;
-            },
+            // ice: function () {
+            //     console.log('event ice ');
+            //     this.readIce() ;
+            // },
             is_video: function () {
                 console.log('event is_video ');
 
@@ -50,7 +56,7 @@
         },
 
         methods: {
-            startVideoChat(){
+             startVideoChat(){
                 console.log('выполняем startVideoChat');
                 if(this.start){
                     return
@@ -65,7 +71,12 @@
                 this.yourVideo.srcObject = null;
                 this.friendsVideo = this.$refs.friendsVideo;
                 this.friendsVideo.srcObject = null;
-                const servers = {'iceServers': [ {'urls': 'stun:stun.l.google.com:19302'},{'urls': 'stun:stun.services.mozilla.com'}, {'urls': 'turn:numb.viagenie.ca','credential': 'webrtc','username': 'websitebeaver@mail.com'}]};
+                const servers = {'iceServers': [
+                        {'urls': 'stun:stun.l.google.com:19302'},
+                        {url: 'turn:turn.anyfirewall.com:443?transport=tcp',
+                        credential: 'webrtc',
+                        username: 'webrtc'}
+                    ]};
                 // console.log(servers);
                 this.pc = new RTCPeerConnection(servers);
                  console.log('перед pc.onicecandidate');
@@ -74,7 +85,9 @@
                         this.sendMessage({'ice_send': event.candidate});
                         console.log('отправляем ICE кандидатов');
                     } else {
-                        console.log("Sent All Ice " + event.candidate)
+                        console.log("Sent All Ice " + event.candidate);
+                        this.listICE.forEach((item)=> this.pc.addIceCandidate(item));
+                        this.listICE = [];
                     }
                 });
 
@@ -132,6 +145,9 @@
                     }
                 } catch (err) {
                     console.error('что то пошло не так...'+err);
+                    console.error(msg.ice_send);
+                    this.listICE.push(msg.ice_send);
+
                 }
 
             },
@@ -148,10 +164,7 @@
                 } catch (err) {
                     console.error('ошибка вебкамера....'+err);
                 }
-                    // navigator.mediaDevices.getUserMedia({audio:true, video:true})
-                    //      .then(stream => this.yourVideo.srcObject = stream)
-                    //     .then(stream =>stream.getTracks().forEach((track) => pc.addTrack(track, stream)));
-                    //      // .then(stream => this.pc.addStream(stream));
+
             },
 
              showFriendsFace() {
@@ -169,6 +182,17 @@
                         console.error(err);
                     }
                 };
+
+            },
+            endVideoChat(){
+                this.pc.close();
+
+                this.start = false;
+                this.yourVideo.srcObject.getTracks().forEach(track => track.stop());
+                alert('Видеочат с - ' + this.contact.name + '  завершен.');
+                this.pc = null;
+                this.yourVideo.srcObject = null;
+                this.friendsVideo.srcObject = null;
 
             }
 

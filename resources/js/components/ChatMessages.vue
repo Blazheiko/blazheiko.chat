@@ -4,7 +4,7 @@
         <ul class="chat" v-if="messages">
             <li class="left clearfix" v-for="message in messages">
                 <div   class="chat-body clearfix">
-                    <div class="header">
+                    <div class="header" v-if="message.message != '' ">
                         <div class="received" v-if="message.user_id === user.id">
                             <strong class="primary-font">
                                 <img v-bind:src="'/uploads/avatars/'+ user.avatar" style="width:32px; height:32px; border-radius:50%">

@@ -25,10 +25,10 @@ const app = new Vue({
         conversation:null,
         user:null,
         userto:null,
-        conversationid:0,
+        index:0,
+        // conversationid:0,
         unread:0,
         sdp:null,
-        ice:null,
         is_video:false
     },
 
@@ -65,54 +65,56 @@ const app = new Vue({
         handleIncoming(message,userFrom) {
             if (this.contact){
                 console.log(message);
-                if (message.is_video){
-                    if (message.is_photo){
+                if (message.is_video &&
+                    message.is_photo &&
+                    this.isOnContacts(message.conversation_id)){
                         console.log('пришло is_video');
-                        this.selectedContact(userFrom);
-                        this.is_video=true;
-                    }else {
-                        this.sdp = message.video_descr;
-                         console.log('пришло video_descr'+ message.video_descr);
-                    }
+                        this.startVideoChat(userFrom);
                 }
                 if (message.conversation_id == this.conversation.id) {
-                    this.messages.push(message);
-                    this.incrementCounter(userFrom.id);
-                }
-                else {
-                    for (i=0;i < this.contacts.length;i++) {
-                        if (this.contacts[i].contact.id == userFrom.id) {
-                            // this.contacts[i].unread++;
-                            this.contacts[i].counter++;
-                            // this.sendUnread(this.contacts[i].unread,message.conversation_id);
-                            return
-                        }
+                    if (message.is_video){
+                        this.sdp = message.video_descr;
+                        console.log('пришло video_descr'+ message.video_descr);
+                    }else {
+                        this.messages.push(message);
                     }
                 }
             }
+            this.incrementCounter(message.conversation_id)
 
         },
-        incrementCounter(idUserFrom){
+        isOnContacts(conversationId){
+            let flag = false;
             for (i=0;i < this.contacts.length;i++){
-                if (this.contacts[i].contact.id == idUserFrom){
+                if (this.contacts[i].conversation_id == conversationId){
+                    flag = true;
+                    break;
+                }
+            }
+            return flag;
+        },
+        incrementCounter(conversationId){
+            for (i=0;i < this.contacts.length;i++){
+                if (this.contacts[i].conversation_id == conversationId){
                     this.contacts[i].counter ++;
-                    this.contacts[i].count_read ++;
-                    return
+                    // this.contacts[i].count_read ++;
+                    break
                 }
             }
         },
         // выравниваем колличество прочитанных и непрочитанных
         resetUnread(){
-            for (i=0;i < this.contacts.length;i++){
-                if (this.contacts[i].contact.id == this.contact.id){
-                    this.contacts[i].count_read =this.conversation.counter;
-                    this.contacts[i].counter =this.conversation.counter;
-                    return
-                }
-            }
+            // for (i=0;i < this.contacts.length;i++){
+            //     if (this.contacts[i].contact.id == this.contact.id){
+                    this.contacts[this.index].count_read =this.conversation.counter;
+                    this.contacts[this.index].counter =this.conversation.counter;
+            //         return
+            //     }
+            // }
         },
-        startVideoChat(){
-            video_is = true;
+        startVideoChat(contact){
+            this.selectedContact(contact);
+            this.video_is = true;
 
         },
         // запрашиваем у сервера список контактов
@@ -124,7 +126,12 @@ const app = new Vue({
         },
 
         selectedContact(contact){
-            this.contact=contact;
+            this.contact= contact;
+            for (let i; i<this.contacts.length ; i++){
+                if (this.contacts[i].contact.id == contact.id) {
+                    this.index = i ;
+                    break}
+            }
             this.fetchMessages(contact);
         },
 
