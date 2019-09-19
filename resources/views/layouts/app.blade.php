@@ -157,6 +157,7 @@
             height:200px;
 
         }
+
     </style>
 </head>
 <body>
@@ -168,9 +169,9 @@
                 </a>
                 {{--<a href="{{ url('chat/') }}"> Chat </a>--}}
                 {{--<a href="/blogs">Blogs</a>--}}
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span href="/blogs" class="navbar-toggler-icon">БЛОГИ</span>
-                </button>
+{{--                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">--}}
+{{--                    <span href="/blogs" class="navbar-toggler-icon">БЛОГИ</span>--}}
+{{--                </button>--}}
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->

@@ -38,7 +38,7 @@ const app = new Vue({
 
         Echo.private('chat')
             .listen('MessageSent', (e) => {
-                // console.log(e.message.conversation_id);
+                // console.log('Echo.private(chat)'+e.user);
                 this.handleIncoming(e.message,e.user);
             });
     },
@@ -64,11 +64,13 @@ const app = new Vue({
 
         //обрабатываем сообщение от пушера
         handleIncoming(message,userFrom) {
-            if (this.contact){
-                console.log(message);
+            // console.log(userFrom);
+            if (this.user.id == message.user_to){
+                console.log('в условии '+ message);
+                // console.log('в условии с '+ userFrom);
+                this.incrementCounter(userFrom);
                 if (message.is_video &&
-                    message.is_photo &&
-                    this.isOnContacts(message.conversation_id)){
+                    message.is_photo ){
                         console.log('пришло is_video');
                         this.startVideoChat(userFrom);
                 }
@@ -81,8 +83,8 @@ const app = new Vue({
                         this.contacts[this.index].count_read ++;
                     }
                 }
+
             }
-            this.incrementCounter(message.conversation_id)
 
         },
         isOnContacts(conversationId){
@@ -95,10 +97,12 @@ const app = new Vue({
             }
             return flag;
         },
-        incrementCounter(conversationId){
-            for (i=0;i < this.contacts.length;i++){
-                if (this.contacts[i].conversation_id == conversationId){
+        incrementCounter(userFrom){
+            console.log('в incrementCounter(userFrom)');
+            for (let i=0;i < this.contacts.length; i++){
+                if (this.contacts[i].contact.id == userFrom.id){
                     this.contacts[i].counter ++;
+                    console.log('this.contacts[i].counter ++');
                     // this.contacts[i].count_read ++;
                     break
                 }
@@ -161,7 +165,9 @@ const app = new Vue({
             axios.post('/photo/'+this.conversation.id,photoname)
                 .then((response) => {
                     this.messages.push(response.data.message);
-                    this.incrementCounter(this.conversation.id);
+                    this.contacts[this.index].count_read++;
+                    this.contacts[this.index].counter++;
+                    // this.incrementCounter(this.conversation.id);
                     console.log(response.data);
                 })
         },

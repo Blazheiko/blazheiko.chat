@@ -11,7 +11,7 @@ class Message extends Model
      *
      * @var array
      */
-    protected $fillable = ['message','photo_url','is_photo','conversation_id','is_video','video_descr'];
+    protected $fillable = ['message','photo_url','is_photo','conversation_id','is_video','video_descr','user_to'];
 
     /**
      * A message belong to a user

@@ -20,11 +20,12 @@ class VideoChatController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function message(Request $request,$id)
+    public function message(Request $request,$id,$user_to_id)
     {
         $user = Auth::user();
         $messagesNew = $user->messages()->create([
             'conversation_id'=>$id,
+            'user_to'=>$user_to_id,
             'message'=>'',
             'is_photo'=>false,
             'is_video'=>true,
@@ -35,13 +36,18 @@ class VideoChatController extends Controller
 
     }
 
-    public function offerVideoChat($id)
+    public function offerVideoChat($id,$user_to_id)
     {
         $user = Auth::user();
 //        $user->messages()->where('video_descr', '!=', null)->delete();
         Message::where('video_descr', '!=', null)->delete();
         $messagesNew = $user->messages()->create([
-            'conversation_id'=>$id,'message'=>'Видеочат','photo_url'=>'editor_icon_124382.png','is_photo'=>true, 'is_video'=>true
+            'conversation_id'=>$id,
+            'user_to'=>$user_to_id,
+            'message'=>'Видеочат',
+            'photo_url'=>'editor_icon_124382.png',
+            'is_photo'=>true,
+            'is_video'=>true
         ]);
 
         broadcast(new MessageSent($user, $messagesNew))->toOthers();

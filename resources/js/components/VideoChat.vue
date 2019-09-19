@@ -103,14 +103,14 @@
             offerVideoChat(){
                 console.log('выполняем offerVideoChat()');
                 this.startVideoChat();
-                axios.get('/offerVideoChat/'+this.conversation.id);
+                axios.get('/offerVideoChat/'+this.conversation.id+'/'+this.contact.id);
 
             },
 
 
             sendMessage( data) {
                 console.log(data);
-                axios.post('/videoChat/'+ this.conversation.id, {
+                axios.post('/videoChat/'+ this.conversation.id+'/'+this.contact.id, {
                     data: JSON.stringify(data)
                 })
             },

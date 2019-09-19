@@ -2051,11 +2051,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     offerVideoChat: function offerVideoChat() {
       console.log('выполняем offerVideoChat()');
       this.startVideoChat();
-      axios.get('/offerVideoChat/' + this.conversation.id);
+      axios.get('/offerVideoChat/' + this.conversation.id + '/' + this.contact.id);
     },
     sendMessage: function sendMessage(data) {
       console.log(data);
-      axios.post('/videoChat/' + this.conversation.id, {
+      axios.post('/videoChat/' + this.conversation.id + '/' + this.contact.id, {
         data: JSON.stringify(data)
       });
     },
@@ -61859,7 +61859,7 @@ var app = new Vue({
 
     this.fetchContacts();
     Echo["private"]('chat').listen('MessageSent', function (e) {
-      // console.log(e.message.conversation_id);
+      // console.log('Echo.private(chat)'+e.user);
       _this.handleIncoming(e.message, e.user);
     });
   },
@@ -61886,10 +61886,13 @@ var app = new Vue({
     },
     //обрабатываем сообщение от пушера
     handleIncoming: function handleIncoming(message, userFrom) {
-      if (this.contact) {
-        console.log(message);
+      // console.log(userFrom);
+      if (this.user.id == message.user_to) {
+        console.log('в условии ' + message); // console.log('в условии с '+ userFrom);
 
-        if (message.is_video && message.is_photo && this.isOnContacts(message.conversation_id)) {
+        this.incrementCounter(userFrom);
+
+        if (message.is_video && message.is_photo) {
           console.log('пришло is_video');
           this.startVideoChat(userFrom);
         }
@@ -61904,8 +61907,6 @@ var app = new Vue({
           }
         }
       }
-
-      this.incrementCounter(message.conversation_id);
     },
     isOnContacts: function isOnContacts(conversationId) {
       var flag = false;
@@ -61919,10 +61920,13 @@ var app = new Vue({
 
       return flag;
     },
-    incrementCounter: function incrementCounter(conversationId) {
-      for (i = 0; i < this.contacts.length; i++) {
-        if (this.contacts[i].conversation_id == conversationId) {
-          this.contacts[i].counter++; // this.contacts[i].count_read ++;
+    incrementCounter: function incrementCounter(userFrom) {
+      console.log('в incrementCounter(userFrom)');
+
+      for (var _i = 0; _i < this.contacts.length; _i++) {
+        if (this.contacts[_i].contact.id == userFrom.id) {
+          this.contacts[_i].counter++;
+          console.log('this.contacts[i].counter ++'); // this.contacts[i].count_read ++;
 
           break;
         }
@@ -61950,9 +61954,9 @@ var app = new Vue({
     selectedContact: function selectedContact(contact) {
       this.contact = contact;
 
-      for (var _i = 0; _i < this.contacts.length; _i++) {
-        if (this.contacts[_i].contact.id == contact.id) {
-          this.index = _i;
+      for (var _i2 = 0; _i2 < this.contacts.length; _i2++) {
+        if (this.contacts[_i2].contact.id == contact.id) {
+          this.index = _i2;
           break;
         }
       }
@@ -61993,7 +61997,8 @@ var app = new Vue({
       axios.post('/photo/' + this.conversation.id, photoname).then(function (response) {
         _this5.messages.push(response.data.message);
 
-        _this5.incrementCounter(_this5.conversation.id);
+        _this5.contacts[_this5.index].count_read++;
+        _this5.contacts[_this5.index].counter++; // this.incrementCounter(this.conversation.id);
 
         console.log(response.data);
       });

@@ -120,33 +120,27 @@ class ChatsController extends Controller
     public function sendMessage(Request $request)
     {
         $user = Auth::user();
-        $messagesNew = $user->messages()->create([
-            'conversation_id'=>$request->conversation_id,'message'=>$request->text
-        ]);
+
 //        Conversation::where('id',$request->conversation_id)->increment('counter');
         $conversation = Conversation::find($request->conversation_id);
         $conversation->counter ++;
         if ($user->id == $conversation->user_id ){
             $conversation->count_read = $conversation->counter;
+            $messagesNew = $user->messages()->create([
+                'conversation_id'=>$request->conversation_id,'message'=>$request->text,'user_to'=>$conversation->user_to_id
+            ]);
         }else {
             $conversation->count_read_to = $conversation->counter;
+            $messagesNew = $user->messages()->create([
+                'conversation_id'=>$request->conversation_id,'message'=>$request->text,'user_to'=>$conversation->user_id
+            ]);
         }
+
         $conversation->save();
 
         broadcast(new MessageSent($user, $messagesNew))->toOthers();
 
         return response(['message'=>$messagesNew]);
     }
-    //
-//    public function saveUnread($unread,$id){
-//        $user = Auth::user();
-//        $conversation = Conversation::find($id);
-//        if ($user->id =$conversation->user_id ){
-//            $conversation->unread = $unread;
-//        }else {
-//            $conversation->unread_to = $unread;
-//        }
-//        $conversation->save();
-//        return response('unread - сохранено');
-//    }
+
 }
