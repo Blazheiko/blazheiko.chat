@@ -162,7 +162,7 @@ const app = new Vue({
             e.preventDefault();
             let photoname = this.gatherFormData();
 
-            axios.post('/photo/'+this.conversation.id,photoname)
+            axios.post('/photo/'+this.conversation.id+'/'+this.userto.id,photoname)
                 .then((response) => {
                     this.messages.push(response.data.message);
                     this.contacts[this.index].count_read++;

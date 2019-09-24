@@ -8,7 +8,7 @@
             <button @click="endVideoChat()" type="button" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true" ></span> Закончить видеочат </button>
         </div>
         <div v-else >
-        <button @click="offerVideoChat()" type="button" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true" ></span> Видеочат </button>
+            <button @click="offerVideoChat()" type="button" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true" ></span> Видеочат </button>
         </div>
 
         </div>

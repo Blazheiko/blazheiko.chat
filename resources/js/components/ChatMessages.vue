@@ -2,8 +2,8 @@
 <template>
 
         <ul class="chat" v-if="messages">
-            <li class="left clearfix" v-for="message in messages">
-                <div   class="chat-body clearfix" v-if="message.message != '' ">
+            <li class="left clearfix" v-for="(message, index) in messages"  @click="translate(message.message,index)">
+                <div   class="chat-body clearfix" v-if="message.message != '' || message.is_photo">
                     <div class="header">
                         <div class="received" v-if="message.user_id === user.id">
                             <strong class="primary-font">
@@ -60,7 +60,20 @@
 <script>
     export default {
         props: ['messages','user','userto'],
+        methods:{
+            translate(message,index){
+                if (!this.messages[index].translate)
+                axios.post('/translate/ru', {
+                    text: message
+                }).then((response) => {
+                    // console.log(response.data.translate);
+                    this.messages[index].message = message + '\n --||-- \n' + response.data.translate;
+                    this.messages[index].translate = true ;
+                })
+            },
+        }
     };
+
 </script>
 
 <style lang="scss" scoped>

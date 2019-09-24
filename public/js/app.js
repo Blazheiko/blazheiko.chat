@@ -1741,10 +1741,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      message: ''
+      message: '',
+      translateMessage: ''
     };
   },
   methods: {
@@ -1753,10 +1772,42 @@ __webpack_require__.r(__webpack_exports__);
 
       if (this.message == '') {
         return;
+      } else if (this.isKyr(this.message)) {
+        this.$emit('send', this.message);
+        this.message = '';
+        this.translateMessage = '';
+      } else alert('В сообщении присутствуют символы кирилицы');
+    },
+    sendTranslate: function sendTranslate(e) {
+      e.preventDefault();
+
+      if (this.translateMessage == '') {
+        return;
+      } else if (this.isKyr(this.translateMessage)) {
+        this.$emit('send', this.translateMessage);
+        this.message = '';
+        this.translateMessage = '';
+      } else alert('В сообщении присутствуют символы кирилицы');
+    },
+    translate: function translate() {
+      var _this = this;
+
+      axios.post('/translate/en', {
+        text: this.message
+      }).then(function (response) {
+        console.log(response.data);
+        console.log(response.data.translate);
+        _this.translateMessage = response.data.translate;
+      });
+    },
+    isKyr: function isKyr(str) {
+      for (var i = 0; i < str.length; i++) {
+        if (str.charCodeAt(i) > 122) {
+          return false;
+        }
       }
 
-      this.$emit('send', this.message);
-      this.message = '';
+      return true;
     }
   }
 });
@@ -1898,7 +1949,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['messages', 'user', 'userto']
+  props: ['messages', 'user', 'userto'],
+  methods: {
+    translate: function translate(message, index) {
+      var _this = this;
+
+      if (!this.messages[index].translate) axios.post('/translate/ru', {
+        text: message
+      }).then(function (response) {
+        // console.log(response.data.translate);
+        _this.messages[index].message = message + '\n --||-- \n' + response.data.translate;
+        _this.messages[index].translate = true;
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -6741,7 +6805,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".composer textarea[data-v-6fb73fa7] {\n  width: 550px;\n  margin: 10px;\n  resize: none;\n  border-radius: 3px;\n  border: 1px solid lightgray;\n  padding: 6px;\n}", ""]);
+exports.push([module.i, ".composer textarea[data-v-6fb73fa7] {\n  width: 550px;\n  margin: 10px;\n  resize: none;\n  border-radius: 3px;\n  border: 1px solid lightgray;\n  padding: 6px;\n}\nbutton[data-v-6fb73fa7] {\n  margin: 5px 0px 0px 10px !important;\n  width: 250px;\n  height: 30px;\n  border-radius: 5px;\n}", ""]);
 
 // exports
 
@@ -49314,6 +49378,78 @@ var render = function() {
           }
         }
       })
+    ]),
+    _vm._v(" "),
+    _c("a", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-warning",
+          attrs: { type: "button" },
+          on: { click: _vm.send }
+        },
+        [_vm._v("Отправить оригинал ")]
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-success ",
+          attrs: { type: "button" },
+          on: {
+            click: function($event) {
+              return _vm.translate()
+            }
+          }
+        },
+        [_vm._v(" Перевести на английский ")]
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "composer" }, [
+      _c("textarea", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.translateMessage,
+            expression: "translateMessage"
+          }
+        ],
+        attrs: { placeholder: "Translation..." },
+        domProps: { value: _vm.translateMessage },
+        on: {
+          keydown: function($event) {
+            if (
+              !$event.type.indexOf("key") &&
+              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+            ) {
+              return null
+            }
+            return _vm.sendTranslate($event)
+          },
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.translateMessage = $event.target.value
+          }
+        }
+      })
+    ]),
+    _vm._v(" "),
+    _c("a", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-warning",
+          attrs: { type: "button" },
+          on: { click: _vm.sendTranslate }
+        },
+        [_vm._v(" Отправить перевод ")]
+      )
     ])
   ])
 }
@@ -49421,142 +49557,153 @@ var render = function() {
     ? _c(
         "ul",
         { staticClass: "chat" },
-        _vm._l(_vm.messages, function(message) {
-          return _c("li", { staticClass: "left clearfix" }, [
-            message.message != ""
-              ? _c("div", { staticClass: "chat-body clearfix" }, [
-                  _c("div", { staticClass: "header" }, [
-                    message.user_id === _vm.user.id
-                      ? _c("div", { staticClass: "received" }, [
-                          _c("strong", { staticClass: "primary-font" }, [
-                            _c("img", {
-                              staticStyle: {
-                                width: "32px",
-                                height: "32px",
-                                "border-radius": "50%"
-                              },
-                              attrs: {
-                                src: "/uploads/avatars/" + _vm.user.avatar
-                              }
-                            }),
-                            _vm._v(
-                              "\n                        " +
-                                _vm._s(_vm.user.name) +
-                                "\n                    "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "text" }, [
-                            _vm._v(
-                              "\n                        " +
-                                _vm._s(message.message) +
-                                "\n                    "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "date" }, [
-                            _vm._v(
-                              "\n                        " +
-                                _vm._s(message.created_at) +
-                                "\n                    "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          message.is_photo
-                            ? _c("span", [
-                                _c("div", { staticClass: "modal-header" }, [
-                                  _c(
-                                    "div",
-                                    {
-                                      staticClass: "col-md-10 col-md-offset-1"
-                                    },
-                                    [
-                                      _c("img", {
-                                        staticStyle: {
-                                          width: "150px",
-                                          height: "150px",
-                                          float: "left",
-                                          "margin-right": "25px"
-                                        },
-                                        attrs: {
-                                          src:
-                                            "/uploads/photos/" +
-                                            message.photo_url
-                                        }
-                                      })
-                                    ]
-                                  )
+        _vm._l(_vm.messages, function(message, index) {
+          return _c(
+            "li",
+            {
+              staticClass: "left clearfix",
+              on: {
+                click: function($event) {
+                  return _vm.translate(message.message, index)
+                }
+              }
+            },
+            [
+              message.message != "" || message.is_photo
+                ? _c("div", { staticClass: "chat-body clearfix" }, [
+                    _c("div", { staticClass: "header" }, [
+                      message.user_id === _vm.user.id
+                        ? _c("div", { staticClass: "received" }, [
+                            _c("strong", { staticClass: "primary-font" }, [
+                              _c("img", {
+                                staticStyle: {
+                                  width: "32px",
+                                  height: "32px",
+                                  "border-radius": "50%"
+                                },
+                                attrs: {
+                                  src: "/uploads/avatars/" + _vm.user.avatar
+                                }
+                              }),
+                              _vm._v(
+                                "\n                        " +
+                                  _vm._s(_vm.user.name) +
+                                  "\n                    "
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "text" }, [
+                              _vm._v(
+                                "\n                        " +
+                                  _vm._s(message.message) +
+                                  "\n                    "
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "date" }, [
+                              _vm._v(
+                                "\n                        " +
+                                  _vm._s(message.created_at) +
+                                  "\n                    "
+                              )
+                            ]),
+                            _vm._v(" "),
+                            message.is_photo
+                              ? _c("span", [
+                                  _c("div", { staticClass: "modal-header" }, [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass: "col-md-10 col-md-offset-1"
+                                      },
+                                      [
+                                        _c("img", {
+                                          staticStyle: {
+                                            width: "150px",
+                                            height: "150px",
+                                            float: "left",
+                                            "margin-right": "25px"
+                                          },
+                                          attrs: {
+                                            src:
+                                              "/uploads/photos/" +
+                                              message.photo_url
+                                          }
+                                        })
+                                      ]
+                                    )
+                                  ])
                                 ])
-                              ])
-                            : _vm._e()
-                        ])
-                      : _c("div", { staticClass: "sent" }, [
-                          _c("strong", { staticClass: "primary-font" }, [
-                            _c("img", {
-                              staticStyle: {
-                                width: "32px",
-                                height: "32px",
-                                "border-radius": "50%"
-                              },
-                              attrs: {
-                                src: "/uploads/avatars/" + _vm.userto.avatar
-                              }
-                            }),
-                            _vm._v(
-                              "\n                            " +
-                                _vm._s(_vm.userto.name) +
-                                "\n                        "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "text" }, [
-                            _vm._v(
-                              "\n                        " +
-                                _vm._s(message.message) +
-                                "\n                    "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "date" }, [
-                            _vm._v(
-                              "\n                        " +
-                                _vm._s(message.created_at) +
-                                "\n                    "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          message.is_photo
-                            ? _c("span", [
-                                _c("div", { staticClass: "modal-header" }, [
-                                  _c(
-                                    "div",
-                                    {
-                                      staticClass: "col-md-10 col-md-offset-1"
-                                    },
-                                    [
-                                      _c("img", {
-                                        staticStyle: {
-                                          width: "150px",
-                                          height: "150px",
-                                          float: "left",
-                                          "margin-right": "25px"
-                                        },
-                                        attrs: {
-                                          src:
-                                            "/uploads/photos/" +
-                                            message.photo_url
-                                        }
-                                      })
-                                    ]
-                                  )
+                              : _vm._e()
+                          ])
+                        : _c("div", { staticClass: "sent" }, [
+                            _c("strong", { staticClass: "primary-font" }, [
+                              _c("img", {
+                                staticStyle: {
+                                  width: "32px",
+                                  height: "32px",
+                                  "border-radius": "50%"
+                                },
+                                attrs: {
+                                  src: "/uploads/avatars/" + _vm.userto.avatar
+                                }
+                              }),
+                              _vm._v(
+                                "\n                            " +
+                                  _vm._s(_vm.userto.name) +
+                                  "\n                        "
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "text" }, [
+                              _vm._v(
+                                "\n                        " +
+                                  _vm._s(message.message) +
+                                  "\n                    "
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "date" }, [
+                              _vm._v(
+                                "\n                        " +
+                                  _vm._s(message.created_at) +
+                                  "\n                    "
+                              )
+                            ]),
+                            _vm._v(" "),
+                            message.is_photo
+                              ? _c("span", [
+                                  _c("div", { staticClass: "modal-header" }, [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass: "col-md-10 col-md-offset-1"
+                                      },
+                                      [
+                                        _c("img", {
+                                          staticStyle: {
+                                            width: "150px",
+                                            height: "150px",
+                                            float: "left",
+                                            "margin-right": "25px"
+                                          },
+                                          attrs: {
+                                            src:
+                                              "/uploads/photos/" +
+                                              message.photo_url
+                                          }
+                                        })
+                                      ]
+                                    )
+                                  ])
                                 ])
-                              ])
-                            : _vm._e()
-                        ])
+                              : _vm._e()
+                          ])
+                    ])
                   ])
-                ])
-              : _vm._e()
-          ])
+                : _vm._e()
+            ]
+          )
         }),
         0
       )
@@ -61994,7 +62141,7 @@ var app = new Vue({
 
       e.preventDefault();
       var photoname = this.gatherFormData();
-      axios.post('/photo/' + this.conversation.id, photoname).then(function (response) {
+      axios.post('/photo/' + this.conversation.id + '/' + this.userto.id, photoname).then(function (response) {
         _this5.messages.push(response.data.message);
 
         _this5.contacts[_this5.index].count_read++;

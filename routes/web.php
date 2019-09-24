@@ -46,13 +46,14 @@ Route::get('/comment/{comment}/delete', ['as' => 'comment.destroy', 'uses' => 'C
 Route::get('/chat', 'ChatsController@index');
 Route::get('messages/{id}', 'ChatsController@fetchMessages');
 Route::post('messages', 'ChatsController@sendMessage');
+Route::post('translate/{target}', 'TranslateController@translate');
 //
 //Route::get('saveUnread/{unread}/{id}', 'ChatsController@saveUnread');
 
 Route::get('conversations', 'ChatsController@fetchConversations');
 Route::get('contacts', 'ChatsController@fetchContacts');
 
-Route::post('/photo/{id}', ['as' => 'addphoto',  'uses' =>'UploadPhotoController']);
+Route::post('/photo/{id}/{user_to_id}', ['as' => 'addphoto',  'uses' =>'UploadPhotoController']);
 
 Route::post('/videoChat/{id}/{user_to_id}', ['as' => 'videoChat',  'uses' =>'VideoChatController@message']);
 

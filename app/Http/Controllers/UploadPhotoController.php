@@ -12,7 +12,7 @@ use Intervention\Image\Facades\Image;
 class UploadPhotoController extends Controller
 {
 
-    public function __invoke (Request $request,$id){
+    public function __invoke (Request $request,$id,$user_to_id){
 //        return response($id);
         // Handle the user upload of avatar
         if($request->hasFile('photo')){
@@ -23,7 +23,7 @@ class UploadPhotoController extends Controller
 
             $user = Auth::user();
             $messagesNew = $user->messages()->create([
-                'conversation_id'=>$id,'photo_url'=>$filename,'is_photo'=>true
+                'conversation_id'=>$id,'photo_url'=>$filename,'is_photo'=>true,'user_to'=>$user_to_id
             ]);
 
             broadcast(new MessageSent($user, $messagesNew))->toOthers();
