@@ -28,6 +28,7 @@
 
 <script>
     export default {
+        props: ['user'],
         data() {
             return {
                 message: '',
@@ -60,7 +61,7 @@
 
             },
             translate() {
-                axios.post('/translate/en', {
+                axios.post('/translate/en/'+this.user.language, {
                     text: this.message
                 }).then((response) => {
                     console.log(response.data);

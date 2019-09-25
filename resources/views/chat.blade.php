@@ -7,10 +7,11 @@
     <div class="container" xmlns:v-bind="http://www.w3.org/1999/xhtml">
         <div class="row">
             <div class="col-md-12 col-md-offset-2">
-
-
-
                 <div class="panel panel-default">
+                    <div>
+                        <strong> {{$language_default.' - '.$language}}</strong>
+                    </div>
+
                     {{--<example></example>--}}
                     <chat-header :contact="contact"></chat-header>
 
@@ -18,12 +19,14 @@
 
                         <chat-messages
                             :messages="messages"
-                            :user="user" :userto="userto"
+                            :user="user"
+                            :userto="userto"
                         ></chat-messages>
                     </div>
                     <div  class="panel-footer" >
                         <chat-form
                             @send="sendMessage"
+                            :user="user"
                         ></chat-form>
 
                     </div>

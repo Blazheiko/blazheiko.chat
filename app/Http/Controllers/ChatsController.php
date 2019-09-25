@@ -7,6 +7,7 @@ use App\Events\MessageSent;
 use App\Message;
 use App\User;
 use DateTime;
+use Google\Cloud\Translate\TranslateClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,10 +24,40 @@ class ChatsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-       // dd(Message::with('user')->get());
-        return view('chat');
+        $user = Auth::user();
+        if ($user->language ){
+            $language = $user->language;
+        }
+        else{
+            $language =explode('-',$request->server('HTTP_ACCEPT_LANGUAGE'));
+            $language = explode(',',$language[0]);
+            $language = $language[0];
+            $user->language = $language;
+            $user->save();
+        }
+       if ($language == 'en'){
+           $language_default = 'Default language';
+       }
+       else{
+           $projectId = 'project-691433842280';
+
+           $translate = new TranslateClient([
+               'projectId' => $projectId,
+               'key'=> 'AIzaSyAWQ8CR1sAxUoRUsRpOxpNyc7rmzL-tfRQ'
+           ]);
+
+           $text = 'Default language';
+           // Translates some text into Russian
+           $translation = $translate->translate($text, [
+               'target' => $language
+           ]);
+           $language_default = $translation['text'];
+       }
+
+
+        return view('chat')->with(['language_default'=>$language_default,'language'=>$language]);
     }
 
 

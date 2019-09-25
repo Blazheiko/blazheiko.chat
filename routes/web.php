@@ -46,7 +46,7 @@ Route::get('/comment/{comment}/delete', ['as' => 'comment.destroy', 'uses' => 'C
 Route::get('/chat', 'ChatsController@index');
 Route::get('messages/{id}', 'ChatsController@fetchMessages');
 Route::post('messages', 'ChatsController@sendMessage');
-Route::post('translate/{target}', 'TranslateController@translate');
+Route::post('translate/{target}/{source}', 'TranslateController@translate');
 //
 //Route::get('saveUnread/{unread}/{id}', 'ChatsController@saveUnread');
 

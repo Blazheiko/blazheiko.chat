@@ -44,6 +44,7 @@
 
         .chat li {
             width: 600px;
+            height: auto;
             margin-bottom: 10px;
             padding-bottom: 5px;
             border-bottom: 1px dotted #B3A9A9;
@@ -51,6 +52,7 @@
 
         .chat li .chat-body p {
             margin: 0;
+            height: auto;
             color: #777777;
         }
 

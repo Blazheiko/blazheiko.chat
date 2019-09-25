@@ -1760,6 +1760,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['user'],
   data: function data() {
     return {
       message: '',
@@ -1792,7 +1793,7 @@ __webpack_require__.r(__webpack_exports__);
     translate: function translate() {
       var _this = this;
 
-      axios.post('/translate/en', {
+      axios.post('/translate/en/' + this.user.language, {
         text: this.message
       }).then(function (response) {
         console.log(response.data);
@@ -1947,14 +1948,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['messages', 'user', 'userto'],
   methods: {
     translate: function translate(message, index) {
       var _this = this;
 
-      if (!this.messages[index].translate) axios.post('/translate/ru', {
+      if (!this.messages[index].translate) axios.post('/translate/' + this.user.language + '/en', {
         text: message
       }).then(function (response) {
         // console.log(response.data.translate);
@@ -6843,7 +6843,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".received[data-v-e422daa2] {\n  width: -webkit-max-content;\n  width: -moz-max-content;\n  width: max-content;\n  padding: 10px;\n  text-align: right;\n  float: right;\n}\n.received .text[data-v-e422daa2] {\n  /*background: #b2b2b2;*/\n}\n.sent[data-v-e422daa2] {\n  width: -webkit-max-content;\n  width: -moz-max-content;\n  width: max-content;\n  padding: 20px;\n  text-align: left;\n  background: #d5b69fa6;\n}\n.sent .text[data-v-e422daa2] {\n  /*background: #81c4f9;*/\n}", ""]);
+exports.push([module.i, ".received[data-v-e422daa2] {\n  width: 250px;\n  height: auto;\n  padding: 10px;\n  text-align: right;\n  float: right;\n  margin-left: auto;\n  margin-right: 1em;\n}\n.received .text[data-v-e422daa2] {\n  padding: 10px;\n  width: 250px;\n  height: auto;\n  /*display: flex;*/\n  text-align: right;\n  white-space: normal;\n}\n.sent[data-v-e422daa2] {\n  width: 250px;\n  height: auto;\n  padding: 20px;\n  text-align: left;\n  background: #d5b69fa6;\n  margin-left: 0em;\n  margin-right: auto;\n}\n.sent .text[data-v-e422daa2] {\n  width: 250px;\n  height: auto;\n  display: flex;\n  text-align: left;\n  white-space: normal;\n  /*overflow: auto;*/\n  /*background: #b2b2b2;*/\n}\n.left clearfix[data-v-e422daa2] {\n  height: auto;\n}", ""]);
 
 // exports
 
@@ -49571,135 +49571,133 @@ var render = function() {
             [
               message.message != "" || message.is_photo
                 ? _c("div", { staticClass: "chat-body clearfix" }, [
-                    _c("div", { staticClass: "header" }, [
-                      message.user_id === _vm.user.id
-                        ? _c("div", { staticClass: "received" }, [
-                            _c("strong", { staticClass: "primary-font" }, [
-                              _c("img", {
-                                staticStyle: {
-                                  width: "32px",
-                                  height: "32px",
-                                  "border-radius": "50%"
-                                },
-                                attrs: {
-                                  src: "/uploads/avatars/" + _vm.user.avatar
-                                }
-                              }),
-                              _vm._v(
-                                "\n                        " +
-                                  _vm._s(_vm.user.name) +
-                                  "\n                    "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "text" }, [
-                              _vm._v(
-                                "\n                        " +
-                                  _vm._s(message.message) +
-                                  "\n                    "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "date" }, [
-                              _vm._v(
-                                "\n                        " +
-                                  _vm._s(message.created_at) +
-                                  "\n                    "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            message.is_photo
-                              ? _c("span", [
-                                  _c("div", { staticClass: "modal-header" }, [
-                                    _c(
-                                      "div",
-                                      {
-                                        staticClass: "col-md-10 col-md-offset-1"
-                                      },
-                                      [
-                                        _c("img", {
-                                          staticStyle: {
-                                            width: "150px",
-                                            height: "150px",
-                                            float: "left",
-                                            "margin-right": "25px"
-                                          },
-                                          attrs: {
-                                            src:
-                                              "/uploads/photos/" +
-                                              message.photo_url
-                                          }
-                                        })
-                                      ]
-                                    )
-                                  ])
+                    message.user_id === _vm.user.id
+                      ? _c("div", { staticClass: "received" }, [
+                          _c("strong", { staticClass: "primary-font" }, [
+                            _c("img", {
+                              staticStyle: {
+                                width: "32px",
+                                height: "32px",
+                                "border-radius": "50%"
+                              },
+                              attrs: {
+                                src: "/uploads/avatars/" + _vm.user.avatar
+                              }
+                            }),
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(_vm.user.name) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "text" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.message) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "date" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.created_at) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          message.is_photo
+                            ? _c("span", [
+                                _c("div", { staticClass: "modal-header" }, [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "col-md-10 col-md-offset-1"
+                                    },
+                                    [
+                                      _c("img", {
+                                        staticStyle: {
+                                          width: "150px",
+                                          height: "150px",
+                                          float: "left",
+                                          "margin-right": "25px"
+                                        },
+                                        attrs: {
+                                          src:
+                                            "/uploads/photos/" +
+                                            message.photo_url
+                                        }
+                                      })
+                                    ]
+                                  )
                                 ])
-                              : _vm._e()
-                          ])
-                        : _c("div", { staticClass: "sent" }, [
-                            _c("strong", { staticClass: "primary-font" }, [
-                              _c("img", {
-                                staticStyle: {
-                                  width: "32px",
-                                  height: "32px",
-                                  "border-radius": "50%"
-                                },
-                                attrs: {
-                                  src: "/uploads/avatars/" + _vm.userto.avatar
-                                }
-                              }),
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(_vm.userto.name) +
-                                  "\n                        "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "text" }, [
-                              _vm._v(
-                                "\n                        " +
-                                  _vm._s(message.message) +
-                                  "\n                    "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "date" }, [
-                              _vm._v(
-                                "\n                        " +
-                                  _vm._s(message.created_at) +
-                                  "\n                    "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            message.is_photo
-                              ? _c("span", [
-                                  _c("div", { staticClass: "modal-header" }, [
-                                    _c(
-                                      "div",
-                                      {
-                                        staticClass: "col-md-10 col-md-offset-1"
-                                      },
-                                      [
-                                        _c("img", {
-                                          staticStyle: {
-                                            width: "150px",
-                                            height: "150px",
-                                            float: "left",
-                                            "margin-right": "25px"
-                                          },
-                                          attrs: {
-                                            src:
-                                              "/uploads/photos/" +
-                                              message.photo_url
-                                          }
-                                        })
-                                      ]
-                                    )
-                                  ])
+                              ])
+                            : _vm._e()
+                        ])
+                      : _c("div", { staticClass: "sent" }, [
+                          _c("strong", { staticClass: "primary-font" }, [
+                            _c("img", {
+                              staticStyle: {
+                                width: "32px",
+                                height: "32px",
+                                "border-radius": "50%"
+                              },
+                              attrs: {
+                                src: "/uploads/avatars/" + _vm.userto.avatar
+                              }
+                            }),
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(_vm.userto.name) +
+                                "\n                        "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "text" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.message) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "date" }, [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(message.created_at) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          message.is_photo
+                            ? _c("span", [
+                                _c("div", { staticClass: "modal-header" }, [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "col-md-10 col-md-offset-1"
+                                    },
+                                    [
+                                      _c("img", {
+                                        staticStyle: {
+                                          width: "150px",
+                                          height: "150px",
+                                          float: "left",
+                                          "margin-right": "25px"
+                                        },
+                                        attrs: {
+                                          src:
+                                            "/uploads/photos/" +
+                                            message.photo_url
+                                        }
+                                      })
+                                    ]
+                                  )
                                 ])
-                              : _vm._e()
-                          ])
-                    ])
+                              ])
+                            : _vm._e()
+                        ])
                   ])
                 : _vm._e()
             ]
