@@ -41,11 +41,11 @@ class ChatsController extends Controller
            $language_default = 'Default language';
        }
        else{
-           $projectId = 'project-691433842280';
+           $projectId = env('GOOGLE_PROJECT_ID');
 
            $translate = new TranslateClient([
                'projectId' => $projectId,
-               'key'=> 'AIzaSyAWQ8CR1sAxUoRUsRpOxpNyc7rmzL-tfRQ'
+               'key'=> env('GOOGLE_KEY')
            ]);
 
            $text = 'Default language';

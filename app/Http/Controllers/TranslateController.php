@@ -12,11 +12,11 @@ class TranslateController extends Controller
 //            'projectId' => env('GOOGLE_PROJECT_ID'),
     public function translate(Request $request,$target,$source)
     {
-        $projectId = 'project-691433842280';
+        $projectId = env('GOOGLE_PROJECT_ID');
 
         $translate = new TranslateClient([
             'projectId' => $projectId,
-            'key'=> 'AIzaSyAWQ8CR1sAxUoRUsRpOxpNyc7rmzL-tfRQ'
+            'key'=> env('GOOGLE_KEY')
         ]);
 
         $user = Auth::user();
