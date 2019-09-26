@@ -9,11 +9,19 @@
             <div class="col-md-12 col-md-offset-2">
                 <div class="panel panel-default">
                     <div>
-                        <strong> {{$language_default.' - '.$language}}</strong>
+                        <strong> {{$language_default.' - '.$language}}
+                            <select name="lang">
+                                <option>Выберите язык чата</option>
+                                @foreach ($list_lang as $item)
+                                <option  value={{$item['code']}}>{{$item['name']}}</option>
+                                @endforeach
+
+                            </select></strong>
                     </div>
 
                     {{--<example></example>--}}
-                    <chat-header :contact="contact"></chat-header>
+                    <chat-header :contact="contact">
+                    </chat-header>
 
                     <div  ref='messageDisplay' class="panel-bodychat">
 
@@ -38,7 +46,9 @@
                     <chat-list
                         v-on:selected="selectedContact"
                         :contacts="contacts"
-                        :selected_video="selected_video"></chat-list>
+                        :selected_video="selected_video">
+
+                    </chat-list>
                 </div>
             </div>
             <video-chat

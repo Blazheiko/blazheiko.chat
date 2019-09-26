@@ -26,6 +26,15 @@ class ChatsController extends Controller
      */
     public function index(Request $request)
     {
+
+        $translate = new TranslateClient([
+            'projectId' => env('GOOGLE_PROJECT_ID'),
+            'key'=> env('GOOGLE_KEY')
+        ]);
+
+//        dd($result);
+
+        //
         $user = Auth::user();
         if ($user->language ){
             $language = $user->language;
@@ -41,12 +50,6 @@ class ChatsController extends Controller
            $language_default = 'Default language';
        }
        else{
-           $projectId = env('GOOGLE_PROJECT_ID');
-
-           $translate = new TranslateClient([
-               'projectId' => $projectId,
-               'key'=> env('GOOGLE_KEY')
-           ]);
 
            $text = 'Default language';
            // Translates some text into Russian
@@ -55,9 +58,15 @@ class ChatsController extends Controller
            ]);
            $language_default = $translation['text'];
        }
+        $list_lang = $translate->localizedLanguages([
+            'target' => $language,
+        ]);
+//       dd($list_lang);
 
 
-        return view('chat')->with(['language_default'=>$language_default,'language'=>$language]);
+        return view('chat')->with(['language_default'=>$language_default,
+                                        'language'=>$language,
+                                        'list_lang'=>$list_lang]);
     }
 
 

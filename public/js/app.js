@@ -1982,6 +1982,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['contact']
 });
@@ -49732,7 +49738,9 @@ var render = function() {
   return _c("div", [
     _c("strong", [
       _vm._v(
-        "Чат с -     " + _vm._s(_vm.contact ? _vm.contact.name : "не выбран")
+        "Чат с -     " +
+          _vm._s(_vm.contact ? _vm.contact.name : "не выбран") +
+          "\n\n\n    "
       )
     ])
   ])

@@ -1,6 +1,12 @@
 <template>
     <div >
-        <strong>Чат с -     {{contact? contact.name : 'не выбран' }}</strong>
+        <strong>Чат с -     {{contact? contact.name : 'не выбран' }}
+
+
+        </strong>
+
+
+
     </div>
 </template>
 
@@ -8,6 +14,7 @@
     export default {
         props: ['contact'],
     }
+
 
 </script>
 
