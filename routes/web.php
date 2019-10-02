@@ -43,7 +43,8 @@ Route::get('/comment/{comment}/edit',   ['as' => 'comment.edit',    'uses' => 'C
 Route::post('/comment/{comment}',       ['as' => 'comment.update',  'uses' => 'CommentController@update']);
 Route::get('/comment/{comment}/delete', ['as' => 'comment.destroy', 'uses' => 'CommentController@destroy']);
 
-Route::get('/chat', 'ChatsController@index');
+Route::get('/chat', ['as' => 'chat', 'uses' =>'ChatsController@index']);
+Route::post('/chat', ['as' => 'chat.lang', 'uses' => 'ChatsController@language']);
 Route::get('messages/{id}', 'ChatsController@fetchMessages');
 Route::post('messages', 'ChatsController@sendMessage');
 Route::post('translate/{target}/{source}', 'TranslateController@translate');

@@ -10,13 +10,27 @@
                 <div class="panel panel-default">
                     <div>
                         <strong> {{$language_default.' - '.$language}}
-                            <select name="lang">
-                                <option>Выберите язык чата</option>
-                                @foreach ($list_lang as $item)
-                                <option  value={{$item['code']}}>{{$item['name']}}</option>
-                                @endforeach
-
-                            </select></strong>
+                            <form method="POST" action="{{ route('chat.lang') }}">
+                                @csrf
+                                <select name="lang">
+                                    <option>select translator language</option>
+                                    @foreach ($list_lang as $item)
+                                        <option  value={{$item['code']}}>{{$item['name'].' - '.$item['code']}}</option>
+                                    @endforeach
+                                </select>
+                                <input type="submit" value="Select">
+                            </form>
+{{--                            <form action="{{ url('chat/') }}" method="post">--}}
+{{--                                @csrf--}}
+{{--                              <select name="lang">--}}
+{{--                                <option>Выберите язык чата</option>--}}
+{{--                                @foreach ($list_lang as $item)--}}
+{{--                                <option  value={{$item['code']}}>{{$item['name']}}</option>--}}
+{{--                                @endforeach--}}
+{{--                              </select>--}}
+{{--                                <p><input type="submit" value="Select"></p>--}}
+{{--                            </form>--}}
+                        </strong>
                     </div>
 
                     {{--<example></example>--}}

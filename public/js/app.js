@@ -2076,7 +2076,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.yourVideo = this.$refs.yourVideo;
       this.yourVideo.srcObject = null;
       this.friendsVideo = this.$refs.friendsVideo;
-      this.friendsVideo.srcObject = null;
+      this.friendsVideo.srcObject = null; // const servers = {'iceServers': [
+      //         {url: 'turn:35.238.51.251:3478?transport=udp',
+      //             credential: 'test',
+      //             username: 'test',
+      //             password: 'test'
+      //        }
+      //     ]};
+      // const servers = {'iceServers': [
+      //         {url: 'turn:13.53.200.166:3478?transport=tcp',
+      //             credential: 'test',
+      //             username: 'test',
+      //             password: 'test'
+      //        }
+      //     ]};
+
       var servers = {
         'iceServers': [{
           'urls': 'stun:stun.l.google.com:19302'

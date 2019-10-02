@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Conversation;
 use App\Events\MessageSent;
 use App\Message;
+use App\Services\TranslateServise;
 use App\User;
 use DateTime;
 use Google\Cloud\Translate\TranslateClient;
@@ -27,46 +28,53 @@ class ChatsController extends Controller
     public function index(Request $request)
     {
 
-        $translate = new TranslateClient([
-            'projectId' => env('GOOGLE_PROJECT_ID'),
-            'key'=> env('GOOGLE_KEY')
-        ]);
 
-//        dd($result);
+//       $language =preg_split('/,|;/', $request->server('HTTP_ACCEPT_LANGUAGE')); // список языков с коофициентами
 
-        //
+
+//        $translate = new TranslateClient([
+//            'projectId' => env('GOOGLE_PROJECT_ID'),
+//            'key'=> env('GOOGLE_KEY')
+//        ]);
+
+
         $user = Auth::user();
         if ($user->language ){
             $language = $user->language;
         }
         else{
-            $language =explode('-',$request->server('HTTP_ACCEPT_LANGUAGE'));
-            $language = explode(',',$language[0]);
+            $language =preg_split('/,|;|-|_/', $request->server('HTTP_ACCEPT_LANGUAGE'));
             $language = $language[0];
             $user->language = $language;
             $user->save();
         }
+
+        $translation = new TranslateServise();
        if ($language == 'en'){
-           $language_default = 'Default language';
+           $language_default = 'Translator language';
        }
        else{
-
-           $text = 'Default language';
-           // Translates some text into Russian
-           $translation = $translate->translate($text, [
-               'target' => $language
-           ]);
-           $language_default = $translation['text'];
+           $text = 'Translator language';
+           $language_default = $translation->translate($text,$language,'en');
        }
-        $list_lang = $translate->localizedLanguages([
-            'target' => $language,
-        ]);
-//       dd($list_lang);
-
+        $list_lang = $translation->localizedLanguages($language);
 
         return view('chat')->with(['language_default'=>$language_default,
                                         'language'=>$language,
                                         'list_lang'=>$list_lang]);
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function language(Request $request)
+    {
+//       dd($request->lang) ;
+        $user = Auth::user();
+        $user->language = $request->lang;
+        $user->save();
+
+       return redirect()->route('chat');;
     }
 
 
